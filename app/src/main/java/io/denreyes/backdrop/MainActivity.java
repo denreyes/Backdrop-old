@@ -20,8 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-
 import java.util.ArrayList;
 
 import butterknife.Bind;
@@ -85,18 +83,11 @@ public class MainActivity extends AppCompatActivity {
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            Fresco.initialize(getContext());
             View rootView = inflater.inflate(R.layout.fragment_main,container,false);
             ButterKnife.bind(this, rootView);
             ((MainActivity)getActivity()).setSupportActionBar(mToolbar);
             ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-//            Uri uriBackdrop = new Uri.Builder()
-//                    .scheme(UriUtil.LOCAL_RESOURCE_SCHEME) // "res"
-//                    .path(String.valueOf(R.drawable.img_rain_white))
-//                    .build();
-//            mImageBackdrop.setImageURI(uriBackdrop);
-//            mImageBackdrop.setImageURI(Uri.parse("http://images.8tracks.com/cover/i/000/978/909/coffee-4581.jpg?rect=0,0,500,500&q=98&fm=jpg&fit=max"));
             mImageBackdrop.setImageResource(R.drawable.img_rain_white);
             StaggeredGridLayoutManager sglm =
                     new StaggeredGridLayoutManager(getResources().getInteger(R.integer.list_column_count),
