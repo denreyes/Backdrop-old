@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     if (playlistSize != 0) {
                         String spotifyId, playlistTitle, playlistMixer, playlistImg;
                         ArrayList<SpotlightModel> list = new ArrayList<SpotlightModel>();
-                        for (int x = 0; x < featuredPlaylists.playlists.items.size(); x++) {
+                        for (int x = 0; x < playlistSize; x++) {
                             spotifyId = featuredPlaylists.playlists.items.get(x).id;
                             playlistTitle = featuredPlaylists.playlists.items.get(x).name;
                             playlistMixer = featuredPlaylists.playlists.items.get(x).owner.id;

@@ -55,6 +55,7 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
             intent.putExtra("PLAYLIST_ID",mList.get(getPosition()).id);
             intent.putExtra("PLAYLIST_IMG",mList.get(getPosition()).img_url);
             intent.putExtra("PLAYLIST_TITLE",mList.get(getPosition()).title);
+            intent.putExtra("PLAYLIST_MIXER",mList.get(getPosition()).mixer);
             context.startActivity(intent);
         }
     }
