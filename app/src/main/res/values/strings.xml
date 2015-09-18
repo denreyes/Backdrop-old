@@ -4,4 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="by_label">by </string>
+
+    <string name="default_user"></string>
+    <string name="spotify_token">BQDSf4Nxyatt0Vn6qE6k9smsENrpE5sJpEDPiq5W2qk_IxyO0mDSJE6cPJr3BqmA3Uet0Yp8HKepg3qODMsHxNKnev-aBYwnLbZM25QtWcQiAIgq6wmYu5CIQsZWMOV3bSkdUrWLyJYPMSsbOw1io-ekX8U6N8W5MVtT6U14m3O6-DFexOugzKe6wasgQgiWGq6rZ8QyTw822yITIq5chtHSpdveR3RVQf4VMegewb2wuiaoih9g2GGE7iUVsscXTnWLHNyWIFMaMaCljgatmo_iTNfTVUSkpDA7ozq_6VjYBZ9K</string>
 </resources>

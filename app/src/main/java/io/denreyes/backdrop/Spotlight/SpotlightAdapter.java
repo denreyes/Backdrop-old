@@ -1,4 +1,4 @@
-package io.denreyes.backdrop.model;
+package io.denreyes.backdrop.Spotlight;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +26,7 @@ import io.denreyes.backdrop.R;
  */
 public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.ViewHolder> {
     private static final String LOG_TAG = SpotlightAdapter.class.getSimpleName();
-    ArrayList<SpotlightModel> mList;
+    private static ArrayList<SpotlightModel> mList;
 
     public static class ViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
@@ -51,7 +51,11 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
 
         @Override
         public void onClick(View v) {
-            context.startActivity(new Intent(context, PlayerActivity.class));
+            Intent intent = new Intent(context, PlayerActivity.class);
+            intent.putExtra("PLAYLIST_ID",mList.get(getPosition()).id);
+            intent.putExtra("PLAYLIST_IMG",mList.get(getPosition()).img_url);
+            intent.putExtra("PLAYLIST_TITLE",mList.get(getPosition()).title);
+            context.startActivity(intent);
         }
     }
 

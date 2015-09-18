@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -36,7 +37,6 @@ public class AmbientActivity extends AppCompatActivity{
             ((AmbientActivity)getActivity()).setSupportActionBar(mToolbar);
             ((AmbientActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             ((AmbientActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-
             return rootView;
         }
     }

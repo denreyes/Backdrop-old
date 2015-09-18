@@ -1,5 +1,6 @@
 package io.denreyes.backdrop;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,8 +21,8 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import io.denreyes.backdrop.model.PlaylistAdapter;
-import io.denreyes.backdrop.model.PlaylistModel;
+import io.denreyes.backdrop.Playlist.PlaylistAdapter;
+import io.denreyes.backdrop.Playlist.PlaylistModel;
 
 /**
  * Created by DJ on 8/29/2015.
@@ -73,14 +74,15 @@ public class PlayerActivity extends AppCompatActivity {
             Fresco.initialize(getContext());
             View rootView = inflater.inflate(R.layout.fragment_player, container, false);
             ButterKnife.bind(this, rootView);
+            Intent intent = getActivity().getIntent();
 
             mLayoutManager = new LinearLayoutManager(getActivity());
             mLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
 
             ((PlayerActivity) getActivity()).setSupportActionBar(mToolbar);
             ((PlayerActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            ((PlayerActivity) getActivity()).getSupportActionBar().setTitle("I'll be good");
-            mImgAlbumArt.setImageURI(Uri.parse("http://images.8tracks.com/cover/i/000/425/834/tumblr_mfm73difC01qcfzeko1_500-7180.jpg?rect=0,0,527,527&q=98&fm=jpg&fit=max"));
+            ((PlayerActivity) getActivity()).getSupportActionBar().setTitle(intent.getStringExtra("PLAYLIST_TITLE"));
+            mImgAlbumArt.setImageURI(Uri.parse(intent.getStringExtra("PLAYLIST_IMG")));
 
             setRecyclerViewLayoutManager(mLayoutManagerType);
             doMock();

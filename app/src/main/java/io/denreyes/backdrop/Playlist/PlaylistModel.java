@@ -1,4 +1,4 @@
-package io.denreyes.backdrop.model;
+package io.denreyes.backdrop.Playlist;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package io.denreyes.backdrop.model;
+package io.denreyes.backdrop.Playlist;
 
 import android.content.Context;
 import android.net.Uri;
