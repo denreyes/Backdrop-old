@@ -46,7 +46,10 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
             itemView.setOnClickListener(this);
             context = itemView.getContext();
 
-            infoBackground.setAlpha(0.70f);
+//            infoBackground.setAlpha(0.70f);
+            infoBackground.setVisibility(View.GONE);
+            mTextTitle.setVisibility(View.GONE);
+            mTextMixer.setVisibility(View.GONE);
         }
 
         @Override
@@ -77,8 +80,8 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
     public void onBindViewHolder(SpotlightAdapter.ViewHolder holder, int position) {
         Log.d(LOG_TAG, "Element " + position + " set.");
 
-        holder.mTextTitle.setText(mList.get(position).title);
-        holder.mTextMixer.setText("by " + mList.get(position).mixer);
+//        holder.mTextTitle.setText(mList.get(position).title);
+//        holder.mTextMixer.setText("by " + mList.get(position).mixer);
         holder.mImgThumbnail.setImageURI(Uri.parse(mList.get(position).img_url));
     }
 
