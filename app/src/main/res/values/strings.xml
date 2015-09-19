@@ -6,5 +6,7 @@
     <string name="by_label">by </string>
 
     <string name="default_user"></string>
-    <string name="spotify_token">BQAKV0VDqRvoxHUpK199H9kg0So6gm4VMHIBUlyhSDNtvp0vdHAMlYtXcxXnOE4PwmR4QDjO-U8ZjdrYy5f0oF4XIypVJscd-yd8rNJkpWcZPAZUFiEEnhnUo3z8lwt3YgXoyicduxwLRGAeyNlQcHhM45Oh9URXdLb1fwbsThhiDnqzlC8flC4wjQFZm8f-jQefxhW0FXPCZ1ZRrzVQO49T_osVlPe-WF8EnGOOdOkfqRhf63j-2Nfzx1X1OLj1zR3ZX7hJ07Pn2kpZH_eHQeJJjGanchcKUTYxkuxH4TocRF0E</string>
+    <string name="spotify_token">BQBwiwZzz0Q9PeIO_hvnDs5Qgq9PDOCklShBWjnZZ__cw_spqDqA9I5GRWNwmBnuldg6L8CVL1eMpdlDG0-CjoYpmFqnkJ76otvWIcycBpm3_82HZ9zSfUlXWMvP_fCr8d2YGmx1bsHuvqHIUyYzpGKC0ZE9b7dDwAwl6iOA908dQOxihJw2E6JP18wE3Fci7oVwlvVsRg8Yvg57MSmGEz0GFq-tzgEbVyDDNTgrrtzN2Hnp6jY6BgxJoery0amlRFnomCorVI9uOjfNBBIZig4NCLxBzoe1fI0AnOq38FKTg0xR</string>
+    <string name="login_bg">http://25.media.tumblr.com/62b5965afa8ebea1b6bb39046d9ec022/tumblr_myisgaZb0G1s85u2fo1_500.gif</string>
+    <string name="login_spotify">Log in with Spotify</string>
 </resources>
