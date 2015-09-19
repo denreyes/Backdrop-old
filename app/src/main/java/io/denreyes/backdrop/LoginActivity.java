@@ -1,6 +1,7 @@
 package io.denreyes.backdrop;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,6 +27,7 @@ import com.spotify.sdk.android.player.Spotify;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.TracksPager;
@@ -41,15 +43,13 @@ public class LoginActivity extends AppCompatActivity implements
     @Bind(R.id.img_login_bg)
     SimpleDraweeView mImgBg;
 
-    private static final String CLIENT_ID = "1fab4aae4d7a40acbb15aa25d1c3bcd1";
-    private static final String REDIRECT_URI = "backdrop-io://callback";
-
     private Player mPlayer;
     // Request code that will be used to verify if the result comes from correct activity
 // Can be any integer
     private static final int REQUEST_CODE = 1337;
     private static String mTrackId = "";
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
+    SharedPreferences mPrefToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,26 +58,43 @@ public class LoginActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-//        mImgBg.setImageURI(Uri.parse(getString(R.string.login_bg)));
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setUri(Uri.parse(getString(R.string.login_bg)))
                 .setAutoPlayAnimations(true)
                 .build();
         mImgBg.setController(controller);
 
-//        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
-//                AuthenticationResponse.Type.TOKEN,
-//                REDIRECT_URI);
-//        builder.setScopes(new String[]{"user-read-private", "streaming"});
-//        AuthenticationRequest request = builder.build();
-//
-//        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+        mPrefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
+    }
+
+    @OnClick(R.id.btn_login)
+    public void onLoginClick(){
+        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(getString(R.string.spotify_client_id),
+                AuthenticationResponse.Type.TOKEN,
+                getString(R.string.spotify_redirect_uri));
+        builder.setScopes(new String[]{"user-read-private", "streaming"});
+        AuthenticationRequest request = builder.build();
+
+        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        // Check if result comes from the correct activity
+        if (requestCode == REQUEST_CODE) {
+            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
+                mPrefToken.edit().putString("ACCESS_TOKEN", response.getAccessToken()).apply();
+                startActivity(new Intent(this,MainActivity.class));
+            }
+        }
     }
 
     @Override
     public void onLoggedIn() {
         Log.d("MainActivity", "User logged in");
-        startActivity(new Intent(this, MainActivity.class));
     }
 
     @Override

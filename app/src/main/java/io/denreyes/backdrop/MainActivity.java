@@ -3,6 +3,7 @@ package io.denreyes.backdrop;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class MainFragment extends Fragment {
+    public static class MainFragment extends Fragment{
         @Bind(R.id.toolbar)
         Toolbar mToolbar;
         @Bind(R.id.recycler_spotlight)
@@ -100,8 +101,9 @@ public class MainActivity extends AppCompatActivity {
             ButterKnife.bind(this, rootView);
             ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            SharedPreferences prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
             mApi = new SpotifyApi();
-            mApi = mApi.setAccessToken(getString(R.string.spotify_token));
+            mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN",""));
             mSpotify = mApi.getService();
 
             mImageBackdrop.setImageResource(R.drawable.img_storm_white);

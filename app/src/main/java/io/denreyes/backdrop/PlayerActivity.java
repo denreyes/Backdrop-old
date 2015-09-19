@@ -1,6 +1,7 @@
 package io.denreyes.backdrop;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -98,8 +99,9 @@ public class PlayerActivity extends AppCompatActivity {
             mLayoutManager = new LinearLayoutManager(getActivity());
             mLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
 
+            SharedPreferences prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
             mApi = new SpotifyApi();
-            mApi = mApi.setAccessToken(getString(R.string.spotify_token));
+            mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN",""));
             mSpotify = mApi.getService();
 
             ((PlayerActivity) getActivity()).setSupportActionBar(mToolbar);
@@ -110,7 +112,6 @@ public class PlayerActivity extends AppCompatActivity {
             mixer = intent.getStringExtra("PLAYLIST_MIXER");
 
             setRecyclerViewLayoutManager(mLayoutManagerType);
-//            doMock();
             fetchPlaylistTracks();
 
             return rootView;
@@ -141,7 +142,7 @@ public class PlayerActivity extends AppCompatActivity {
                             int playlistSize = playlistTrackPager.items.size();
 
                             if (playlistSize != 0) {
-                                String trackTitle, trackArtist, trackImg;
+                                String trackTitle, trackArtist, trackImg, trackId;
                                 ArrayList<PlaylistModel> list = new ArrayList<PlaylistModel>();
                                 for (int x = 0; x < playlistSize; x++) {
                                     trackTitle = playlistTrackPager.items.get(x).track.name;
@@ -151,7 +152,8 @@ public class PlayerActivity extends AppCompatActivity {
                                         trackArtist = trackArtist + ", " + playlistTrackPager.items.get(x).track.artists.get(a).name;
 
                                     trackImg = playlistTrackPager.items.get(x).track.album.images.get(0).url;
-                                    list.add(new PlaylistModel(trackTitle, trackArtist, trackImg));
+                                    trackId = playlistTrackPager.items.get(x).track.id;
+                                    list.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
                                 }
                                 mAdapter = new PlaylistAdapter(list);
 

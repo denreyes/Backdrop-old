@@ -6,7 +6,8 @@
     <string name="by_label">by </string>
 
     <string name="default_user"></string>
-    <string name="spotify_token">BQBwiwZzz0Q9PeIO_hvnDs5Qgq9PDOCklShBWjnZZ__cw_spqDqA9I5GRWNwmBnuldg6L8CVL1eMpdlDG0-CjoYpmFqnkJ76otvWIcycBpm3_82HZ9zSfUlXWMvP_fCr8d2YGmx1bsHuvqHIUyYzpGKC0ZE9b7dDwAwl6iOA908dQOxihJw2E6JP18wE3Fci7oVwlvVsRg8Yvg57MSmGEz0GFq-tzgEbVyDDNTgrrtzN2Hnp6jY6BgxJoery0amlRFnomCorVI9uOjfNBBIZig4NCLxBzoe1fI0AnOq38FKTg0xR</string>
     <string name="login_bg">http://25.media.tumblr.com/62b5965afa8ebea1b6bb39046d9ec022/tumblr_myisgaZb0G1s85u2fo1_500.gif</string>
     <string name="login_spotify">Log in with Spotify</string>
+    <string name="spotify_client_id">1fab4aae4d7a40acbb15aa25d1c3bcd1</string>
+    <string name="spotify_redirect_uri">backdrop-io://callback</string>
 </resources>
