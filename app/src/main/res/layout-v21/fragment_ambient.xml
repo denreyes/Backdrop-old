@@ -29,6 +29,7 @@
                 android:layout_toLeftOf="@+id/img_rain"
                 android:layout_toStartOf="@+id/img_rain"
                 android:src="@drawable/img_ambient_diner"
+                android:background="?android:selectableItemBackgroundBorderless"
                 android:clickable="true" />
 
             <Space
@@ -49,6 +50,7 @@
                 android:layout_marginLeft="40dp"
                 android:layout_marginRight="40dp"
                 android:src="@drawable/img_ambient_rain"
+                android:background="?android:selectableItemBackgroundBorderless"
                 android:clickable="true"/>
 
             <Space
@@ -69,6 +71,7 @@
                 android:layout_toEndOf="@+id/img_rain"
                 android:layout_toRightOf="@+id/img_rain"
                 android:src="@drawable/img_ambient_cafe"
+                android:background="?android:selectableItemBackgroundBorderless"
                 android:clickable="true" />
 
             <Space
@@ -93,6 +96,7 @@
                 android:layout_toLeftOf="@+id/img_park"
                 android:layout_toStartOf="@+id/img_park"
                 android:src="@drawable/img_ambient_night"
+                android:background="?android:selectableItemBackgroundBorderless"
                 android:clickable="true" />
 
             <Space
@@ -113,6 +117,7 @@
                 android:layout_marginLeft="40dp"
                 android:layout_marginRight="40dp"
                 android:src="@drawable/img_ambient_park"
+                android:background="?android:selectableItemBackgroundBorderless"
                 android:clickable="true" />
 
             <Space
@@ -133,6 +138,7 @@
                 android:layout_toEndOf="@+id/img_park"
                 android:layout_toRightOf="@+id/img_park"
                 android:src="@drawable/img_ambient_storm"
+                android:background="?android:selectableItemBackgroundBorderless"
                 android:clickable="true"/>
 
             <Space
