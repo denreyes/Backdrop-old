@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group>
+        <item
+            android:id="@+id/nav_logout"
+            android:title="@string/logout"
+            android:icon="@drawable/ic_exit" />
+    </group>
+
+    <!--<item android:title="@string/title_nav_pages">-->
+        <!--<menu>-->
+            <!--<item-->
+                <!--android:id="@+id/nav_ans"-->
+                <!--android:title="@string/ans"-->
+                <!--android:icon="@drawable/ic_check_box"/>-->
+            <!--<item-->
+                <!--android:id="@+id/nav_boards"-->
+                <!--android:title="@string/boards"-->
+                <!--android:icon="@drawable/ic_dashboard" />-->
+            <!--<item-->
+                <!--android:id="@+id/nav_new"-->
+                <!--android:title="@string/what"-->
+                <!--android:icon="@drawable/ic_what"/>-->
+            <!--<item-->
+                <!--android:id="@+id/nav_help"-->
+                <!--android:title="@string/help"-->
+                <!--android:icon="@drawable/ic_explore"/>-->
+        <!--</menu>-->
+    <!--</item>-->
+
+</menu>

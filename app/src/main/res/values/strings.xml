@@ -10,4 +10,7 @@
     <string name="login_spotify">Log in with Spotify</string>
     <string name="spotify_client_id">1fab4aae4d7a40acbb15aa25d1c3bcd1</string>
     <string name="spotify_redirect_uri">backdrop-io://callback</string>
+    <string name="logout">Log out</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 </resources>

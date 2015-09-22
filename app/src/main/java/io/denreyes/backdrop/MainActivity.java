@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -23,6 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
 
 import java.util.ArrayList;
 
@@ -86,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView mRecyclerSpotlight;
         @Bind(R.id.backdrop)
         ImageView mImageBackdrop;
+        @Bind(R.id.drawer_layout)
+        DrawerLayout mDrawerLayout;
+        @Bind(R.id.nav_view)
+        NavigationView navigationView;
+        private ActionBarDrawerToggle mDrawerToggle;
 
         private SpotlightAdapter mAdapter;
         private SpotifyApi mApi;
@@ -101,6 +111,23 @@ public class MainActivity extends AppCompatActivity {
             ButterKnife.bind(this, rootView);
             ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            if (navigationView != null) {
+                setupDrawerContent(navigationView);
+
+                mDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close) {
+                    public void onDrawerClosed(View view) {
+                        super.onDrawerClosed(view);
+                    }
+
+                    /** Called when a drawer has settled in a completely open state. */
+                    public void onDrawerOpened(View drawerView) {
+                        super.onDrawerOpened(drawerView);
+                    }
+                };
+                mDrawerLayout.setDrawerListener(mDrawerToggle);
+                mDrawerToggle.syncState();
+            }
+
             SharedPreferences prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
             mApi = new SpotifyApi();
             mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN",""));
@@ -114,6 +141,18 @@ public class MainActivity extends AppCompatActivity {
 
             fetchFeaturedPlaylists();
             return rootView;
+        }
+
+        private void setupDrawerContent(NavigationView navigationView) {
+            navigationView.setNavigationItemSelectedListener(
+                    new NavigationView.OnNavigationItemSelectedListener() {
+                        @Override
+                        public boolean onNavigationItemSelected(MenuItem menuItem) {
+                            menuItem.setChecked(true);
+                            mDrawerLayout.closeDrawers();
+                            return true;
+                        }
+                    });
         }
 
         @OnClick(R.id.fab_drop)
