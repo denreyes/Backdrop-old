@@ -27,20 +27,11 @@
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="@dimen/edge_keyline"
             android:fontFamily="sans-serif-black"
-            android:text="JOHNDOE"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
             android:textColor="#FFF" />
 
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:text="johndoe@email.com"
-            android:textColor="#fff"
-            android:textSize="14sp" />
     </LinearLayout>
 
 </LinearLayout>

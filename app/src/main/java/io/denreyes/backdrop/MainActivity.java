@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +26,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -39,6 +42,7 @@ import io.denreyes.backdrop.Spotlight.SpotlightModel;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.FeaturedPlaylists;
+import kaaes.spotify.webapi.android.models.User;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -95,11 +99,14 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout mDrawerLayout;
         @Bind(R.id.nav_view)
         NavigationView navigationView;
+        @Bind(R.id.progress_bar)
+        ProgressBar mProgressBar;
         private ActionBarDrawerToggle mDrawerToggle;
 
         private SpotlightAdapter mAdapter;
         private SpotifyApi mApi;
         private SpotifyService mSpotify;
+        String username;
 
         private final String LOG_TAG = MainFragment.class.getSimpleName();
         private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
@@ -109,29 +116,14 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             ButterKnife.bind(this, rootView);
-            ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
-            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-            if (navigationView != null) {
-                setupDrawerContent(navigationView);
-
-                mDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close) {
-                    public void onDrawerClosed(View view) {
-                        super.onDrawerClosed(view);
-                    }
-
-                    /** Called when a drawer has settled in a completely open state. */
-                    public void onDrawerOpened(View drawerView) {
-                        super.onDrawerOpened(drawerView);
-                    }
-                };
-                mDrawerLayout.setDrawerListener(mDrawerToggle);
-                mDrawerToggle.syncState();
-            }
-
             SharedPreferences prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
             mApi = new SpotifyApi();
             mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN",""));
             mSpotify = mApi.getService();
+
+            ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            initNav();
 
             mImageBackdrop.setImageResource(R.drawable.img_storm_white);
             StaggeredGridLayoutManager sglm =
@@ -161,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void fetchFeaturedPlaylists() {
+            mProgressBar.setVisibility(View.VISIBLE);
             mSpotify.getFeaturedPlaylists(new Callback<FeaturedPlaylists>() {
                 @Override
                 public void success(FeaturedPlaylists featuredPlaylists, Response response) {
@@ -182,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 mRecyclerSpotlight.setAdapter(mAdapter);
+                                mProgressBar.setVisibility(View.GONE);
                             }
                         });
                     } else {
@@ -190,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 Toast.makeText(getActivity(), "Couldn't get Playlists", Toast.LENGTH_LONG).show();
                                 mRecyclerSpotlight.setAdapter(null);
+                                mProgressBar.setVisibility(View.GONE);
                             }
                         });
                     }
@@ -203,6 +198,44 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getActivity(), "Can't access the web", Toast.LENGTH_LONG).show();
                         }
                     });
+                }
+            });
+        }
+
+        @Bind(R.id.username)
+        TextView mTextNavUser;
+        private void initNav(){
+            if (navigationView != null) {
+                setupDrawerContent(navigationView);
+
+                mDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close) {
+                    public void onDrawerClosed(View view) {
+                        super.onDrawerClosed(view);
+                    }
+
+                    /** Called when a drawer has settled in a completely open state. */
+                    public void onDrawerOpened(View drawerView) {
+                        super.onDrawerOpened(drawerView);
+                    }
+                };
+                mDrawerLayout.setDrawerListener(mDrawerToggle);
+                mDrawerToggle.syncState();
+            }
+            mSpotify.getMe(new Callback<User>() {
+                @Override
+                public void success(User user, Response response) {
+                    username = user.display_name;
+                    MAIN_THREAD.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTextNavUser.setText(username);
+                        }
+                    });
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Toast.makeText(getActivity(), "FUCK", Toast.LENGTH_LONG).show();
                 }
             });
         }
