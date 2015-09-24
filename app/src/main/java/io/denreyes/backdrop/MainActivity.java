@@ -25,12 +25,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class MainFragment extends Fragment{
+    public static class MainFragment extends Fragment implements SlidingUpPanelLayout.PanelSlideListener {
         @Bind(R.id.toolbar)
         Toolbar mToolbar;
         @Bind(R.id.recycler_spotlight)
@@ -101,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView;
         @Bind(R.id.progress_bar)
         ProgressBar mProgressBar;
+        @Bind(R.id.sliding_layout)
+        SlidingUpPanelLayout mSlidingLayout;
         private ActionBarDrawerToggle mDrawerToggle;
 
         private SpotlightAdapter mAdapter;
@@ -118,12 +122,15 @@ public class MainActivity extends AppCompatActivity {
             ButterKnife.bind(this, rootView);
             SharedPreferences prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
             mApi = new SpotifyApi();
-            mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN",""));
+            mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
             mSpotify = mApi.getService();
 
             ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
             initNav();
+            mSlidingLayout.setPanelSlideListener(this);
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
 
             mImageBackdrop.setImageResource(R.drawable.img_storm_white);
             StaggeredGridLayoutManager sglm =
@@ -204,7 +211,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Bind(R.id.username)
         TextView mTextNavUser;
-        private void initNav(){
+
+        private void initNav() {
             if (navigationView != null) {
                 setupDrawerContent(navigationView);
 
@@ -235,9 +243,35 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void failure(RetrofitError error) {
-                    Toast.makeText(getActivity(), "FUCK", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "error", Toast.LENGTH_LONG).show();
                 }
             });
+        }
+
+        //Controller Methods
+        @Override
+        public void onPanelSlide(View view, float v) {
+        }
+
+        @Override
+        public void onPanelCollapsed(View view) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
+        }
+
+        @Override
+        public void onPanelExpanded(View view) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.controller_container, new MaximizedControllerFragment()).commit();
+        }
+
+        @Override
+        public void onPanelAnchored(View view) {
+
+        }
+
+        @Override
+        public void onPanelHidden(View view) {
         }
     }
 }

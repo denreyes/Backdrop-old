@@ -7,13 +7,13 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout
-        xmlns:sothree="http://schemas.android.com/tools"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/tools"
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
         android:gravity="bottom"
-        sothree:umanoPanelHeight="?attr/actionBarSize">
+        sothree:umanoPanelHeight="?attr/listPreferredItemHeight">
 
         <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
@@ -82,6 +82,7 @@
         </android.support.design.widget.CoordinatorLayout>
 
         <FrameLayout
+            android:id="@+id/controller_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/accent"

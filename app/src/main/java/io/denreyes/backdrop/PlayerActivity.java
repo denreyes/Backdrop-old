@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
@@ -64,13 +65,15 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-    public static class PlayerFragment extends Fragment {
+    public static class PlayerFragment extends Fragment implements SlidingUpPanelLayout.PanelSlideListener {
         @Bind(R.id.toolbar)
         Toolbar mToolbar;
         @Bind(R.id.recycler_playlist)
         RecyclerView mRecyclerPlaylist;
         @Bind(R.id.img_album_art)
         SimpleDraweeView mImgAlbumArt;
+        @Bind(R.id.sliding_layout)
+        SlidingUpPanelLayout mSlidingLayout;
 
         PlaylistAdapter mAdapter;
         private SpotifyApi mApi;
@@ -100,7 +103,7 @@ public class PlayerActivity extends AppCompatActivity {
 
             SharedPreferences prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
             mApi = new SpotifyApi();
-            mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN",""));
+            mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
             mSpotify = mApi.getService();
 
             ((PlayerActivity) getActivity()).setSupportActionBar(mToolbar);
@@ -109,6 +112,10 @@ public class PlayerActivity extends AppCompatActivity {
             mImgAlbumArt.setImageURI(Uri.parse(intent.getStringExtra("PLAYLIST_IMG")));
             playlist_id = intent.getStringExtra("PLAYLIST_ID");
             mixer = intent.getStringExtra("PLAYLIST_MIXER");
+
+            mSlidingLayout.setPanelSlideListener(this);
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
 
             setRecyclerViewLayoutManager(mLayoutManagerType);
             fetchPlaylistTracks();
@@ -180,6 +187,31 @@ public class PlayerActivity extends AppCompatActivity {
 
                 }
             });
+        }
+
+        //Controller Methods
+        @Override
+        public void onPanelSlide(View view, float v) {
+        }
+
+        @Override
+        public void onPanelCollapsed(View view) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
+        }
+
+        @Override
+        public void onPanelExpanded(View view) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.controller_container, new MaximizedControllerFragment()).commit();
+        }
+
+        @Override
+        public void onPanelAnchored(View view) {
+        }
+
+        @Override
+        public void onPanelHidden(View view) {
         }
     }
 }

@@ -9,4 +9,5 @@
     <dimen name="circ_size">50dp</dimen>
     <dimen name="button_buttom_keyline">24dp</dimen>
     <dimen name="logo_keyline">80dp</dimen>
+    <dimen name="controller_height">70dp</dimen>
 </resources>
