@@ -3,6 +3,7 @@ package io.denreyes.backdrop;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,6 +30,8 @@ public class MaximizedControllerFragment extends Fragment {
     TextView mTextArtist;
     @Bind(R.id.text_next_title)
     TextView mTextNextTitle;
+    @Bind(R.id.img_album_art)
+    SimpleDraweeView mImgArt;
     private SharedPreferences prefPlayedPos;
 
     @Nullable
@@ -52,7 +57,8 @@ public class MaximizedControllerFragment extends Fragment {
         cursor.move(pos);
         mTextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
         mTextArtist.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST)));
-        cursor.move(pos + 1);
+        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL))));
+        cursor.moveToNext();
         mTextNextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
     }
 }

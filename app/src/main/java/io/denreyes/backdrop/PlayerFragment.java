@@ -138,7 +138,7 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
                                     for (int a = 1; a < playlistTrackPager.items.get(x).track.artists.size(); a++)
                                         trackArtist = trackArtist + ", " + playlistTrackPager.items.get(x).track.artists.get(a).name;
 
-                                    trackImg = playlistTrackPager.items.get(x).track.album.images.get(0).url;
+                                    trackImg = playlistTrackPager.items.get(x).track.album.images.get(1).url;
                                     trackId = playlistTrackPager.items.get(x).track.id;
                                     list.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
                                 }

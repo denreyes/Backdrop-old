@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +37,8 @@ public class MinimizedControllerFragment extends Fragment {
     TextView mTextTitle;
     @Bind(R.id.text_artist)
     TextView mTextArtist;
+    @Bind(R.id.img_album_art)
+    SimpleDraweeView mImgArt;
     private boolean mBroadcastIsRegistered;
     private SharedPreferences prefPlayedPos;
 
@@ -61,6 +66,7 @@ public class MinimizedControllerFragment extends Fragment {
 
         mTextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
         mTextArtist.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST)));
+        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL))));
     }
 
     @Override
@@ -89,6 +95,7 @@ public class MinimizedControllerFragment extends Fragment {
             int position = intent.getIntExtra("TRACK_POSITION",-1);
             mTextTitle.setText(model.get(position).title);
             mTextArtist.setText(model.get(position).artist);
+            mImgArt.setImageURI(Uri.parse(model.get(position).img_url));
         }
     };
 }
