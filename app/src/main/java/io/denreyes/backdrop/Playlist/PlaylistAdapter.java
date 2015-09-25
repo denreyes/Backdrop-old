@@ -2,6 +2,7 @@ package io.denreyes.backdrop.Playlist;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -19,6 +20,7 @@ import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.Spotify;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import butterknife.Bind;
@@ -32,6 +34,7 @@ import kaaes.spotify.webapi.android.models.Track;
  */
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHolder> {
     private static final String LOG_TAG = PlaylistAdapter.class.getSimpleName();
+    public static final String BROADCAST_PLAYLIST_DATA = "io.denreyes.backdrop.playlistdata";
     ArrayList<PlaylistModel> mList;
     String playlistId;
 
@@ -44,8 +47,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         TextView mTextArtist;
         @Bind(R.id.img_album_art)
         SimpleDraweeView mImgAlbumArt;
-        SharedPreferences prefPlaylist, prefToken;
 
+        private SharedPreferences prefPlaylist, prefToken, prefPlayedPos;
         private Player mPlayer;
 
         public ViewHolder(View itemView) {
@@ -53,6 +56,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             ButterKnife.bind(this, itemView);
             context = itemView.getContext();
             itemView.setOnClickListener(this);
+            prefPlayedPos = context.getSharedPreferences("PLAYED_POS_PREF", context.MODE_PRIVATE);
             prefPlaylist = context.getSharedPreferences("PLAYLIST_PREF", context.MODE_PRIVATE);
             prefToken = context.getSharedPreferences("ACCESS_TOKEN_PREF", context.MODE_PRIVATE);
             Config playerConfig = new Config(context, prefToken.getString("ACCESS_TOKEN", ""),
@@ -73,6 +77,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         @Override
         public void onClick(View v) {
             mPlayer.play("spotify:track:" + mList.get(getPosition()).track_id);
+            updateController(mList,getPosition());
 
             //New Playlist Played
             if (!prefPlaylist.getString("PLAYLIST_ID", "").equals(playlistId))
@@ -82,7 +87,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         private void playlistDbUpdate() {
             prefPlaylist.edit().putString("PLAYLIST_ID", playlistId).apply();
             SQLiteDatabase db = new TracksDBHelper(context).getWritableDatabase();
-            db.delete(TracksContract.TracksEntry.TABLE_NAME,null,null);
+            db.delete(TracksContract.TracksEntry.TABLE_NAME, null, null);
             ContentValues values = new ContentValues();
             for (int x = 0; x < getItemCount(); x++) {
                 values.put(TracksContract.TracksEntry.TRACK_TITLE, mList.get(x).title);
@@ -92,7 +97,15 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
                 db.insert(TracksContract.TracksEntry.TABLE_NAME, null, values);
             }
-            Toast.makeText(context,"ADDED",Toast.LENGTH_LONG).show();
+        }
+
+        public void updateController(ArrayList<PlaylistModel> list, int position) {
+            prefPlayedPos.edit().putInt("PLAYED_POS",position+1).apply();
+
+            Intent intent = new Intent(BROADCAST_PLAYLIST_DATA);
+            intent.putParcelableArrayListExtra("LIST_TRACKS", list);
+            intent.putExtra("TRACK_POSITION", position);
+            context.sendBroadcast(intent);
         }
     }
 

@@ -1,6 +1,9 @@
 package io.denreyes.backdrop;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -40,7 +43,7 @@ import retrofit.client.Response;
 /**
  * Created by Dj on 9/24/2015.
  */
-public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.PanelSlideListener {
+public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.PanelSlideListener{
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
     @Bind(R.id.recycler_playlist)
@@ -54,10 +57,9 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
     PlaylistAdapter mAdapter;
     private SpotifyApi mApi;
     private SpotifyService mSpotify;
-
     protected RecyclerView.LayoutManager mLayoutManager;
     protected LayoutManagerType mLayoutManagerType;
-
+    private boolean mBroadcastIsRegistered;
     private final String LOG_TAG = PlayerFragment.class.getSimpleName();
     private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
     String playlist_id, mixer;

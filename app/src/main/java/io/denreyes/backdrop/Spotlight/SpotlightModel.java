@@ -1,27 +1,18 @@
 package io.denreyes.backdrop.Spotlight;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
  * Created by DJ on 8/28/2015.
  */
-public class SpotlightModel implements Serializable {
+public class SpotlightModel implements Parcelable {
     public String title;
     public String mixer;
     public String img_url;
     public String id;
-
-
-    public SpotlightModel() {
-
-    }
-
-    public SpotlightModel(SpotlightModel d) {
-        this.setId(d.id);
-        this.setTitle(d.title);
-        this.setMixer(d.mixer);
-        this.setImage(d.img_url);
-    }
 
     public SpotlightModel(String id, String title, String mixer, String img_url) {
         this.id = id;
@@ -30,20 +21,35 @@ public class SpotlightModel implements Serializable {
         this.img_url = img_url;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(title);
+        out.writeString(mixer);
+        out.writeString(img_url);
+        out.writeString(id);
     }
 
-    public void setMixer(String mixer) {
-        this.mixer = mixer;
+    private SpotlightModel(Parcel in){
+        title=in.readString();
+        mixer=in.readString();
+        img_url=in.readString();
+        id=in.readString();
     }
 
-    public void setImage(String img_url) {
-        this.img_url = img_url;
-    }
+    public static final Parcelable.Creator<SpotlightModel> CREATOR
+            = new Parcelable.Creator<SpotlightModel>() {
+        public SpotlightModel createFromParcel(Parcel in) {
+            return new SpotlightModel(in);
+        }
+
+        public SpotlightModel[] newArray(int size) {
+            return new SpotlightModel[size];
+        }
+    };
 
 }
