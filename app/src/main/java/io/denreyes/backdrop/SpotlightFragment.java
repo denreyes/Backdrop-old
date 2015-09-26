@@ -74,7 +74,6 @@ public class SpotlightFragment extends Fragment {
         ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
         ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        mImageBackdrop.setImageResource(R.drawable.img_storm_white);
         StaggeredGridLayoutManager sglm =
                 new StaggeredGridLayoutManager(getResources().getInteger(R.integer.list_column_count),
                         StaggeredGridLayoutManager.VERTICAL);
@@ -83,6 +82,40 @@ public class SpotlightFragment extends Fragment {
 
         fetchFeaturedPlaylists();
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initBackdropImg();
+    }
+
+    private void initBackdropImg() {
+        SharedPreferences mPrefAmbience = getActivity().getSharedPreferences("AMBIENCE_PREF", getActivity(). MODE_PRIVATE);
+
+        if (mPrefAmbience != null) {
+            int prevKey = mPrefAmbience.getInt("AMBIENCE", -1);
+            switch (prevKey) {
+                case 0:
+                    mImageBackdrop.setImageResource(R.drawable.img_rain_white);
+                    break;
+                case 1:
+                    mImageBackdrop.setImageResource(R.drawable.img_cafe_white);
+                    break;
+                case 2:
+                    mImageBackdrop.setImageResource(R.drawable.img_storm_white);
+                    break;
+                case 3:
+                    mImageBackdrop.setImageResource(R.drawable.img_park_white);
+                    break;
+                case 4:
+                    mImageBackdrop.setImageResource(R.drawable.img_night_white);
+                    break;
+                case 5:
+                    mImageBackdrop.setImageResource(R.drawable.img_diner_white);
+                    break;
+            }
+        }
     }
 
     private void initNav() {
