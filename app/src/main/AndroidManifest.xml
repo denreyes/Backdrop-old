@@ -32,15 +32,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity
-            android:name=".PlayerActivity"
-            android:largeHeap="true"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.Design.Trans">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PlayerActivity" />
-        </activity>
     </application>
 
 </manifest>

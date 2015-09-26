@@ -32,6 +32,8 @@ public class MaximizedControllerFragment extends Fragment {
     TextView mTextNextTitle;
     @Bind(R.id.img_album_art)
     SimpleDraweeView mImgArt;
+    @Bind(R.id.img_filter)
+    SimpleDraweeView mImgFilter;
     private SharedPreferences prefPlayedPos;
 
     @Nullable
@@ -44,6 +46,8 @@ public class MaximizedControllerFragment extends Fragment {
         if(pos != -1){
             populateFromDb(pos);
         }
+
+        mImgFilter.getHierarchy().setPlaceholderImage(R.drawable.filter_black);
 
         return rootView;
     }
@@ -58,7 +62,7 @@ public class MaximizedControllerFragment extends Fragment {
         mTextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
         mTextArtist.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST)));
         mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL))));
-        cursor.moveToNext();
-        mTextNextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
+        if(cursor.moveToNext())
+            mTextNextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
     }
 }

@@ -1,8 +1,10 @@
 package io.denreyes.backdrop.Spotlight;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +20,8 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import io.denreyes.backdrop.PlayerActivity;
+import io.denreyes.backdrop.MainActivity;
+import io.denreyes.backdrop.PlayerFragment;
 import io.denreyes.backdrop.R;
 
 /**
@@ -54,12 +57,20 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(context, PlayerActivity.class);
-            intent.putExtra("PLAYLIST_ID",mList.get(getPosition()).id);
-            intent.putExtra("PLAYLIST_IMG",mList.get(getPosition()).img_url);
-            intent.putExtra("PLAYLIST_TITLE",mList.get(getPosition()).title);
-            intent.putExtra("PLAYLIST_MIXER",mList.get(getPosition()).mixer);
-            context.startActivity(intent);
+            switchToPlayerFragment();
+        }
+
+        private void switchToPlayerFragment() {
+            Bundle bundle = new Bundle();
+            bundle.putString("PLAYLIST_ID", mList.get(getPosition()).id);
+            bundle.putString("PLAYLIST_IMG", mList.get(getPosition()).img_url);
+            bundle.putString("PLAYLIST_TITLE", mList.get(getPosition()).title);
+            bundle.putString("PLAYLIST_MIXER", mList.get(getPosition()).mixer);
+
+            PlayerFragment playerFragment = new PlayerFragment();
+            playerFragment.setArguments(bundle);
+            ((MainActivity)context).getSupportFragmentManager()
+                    .beginTransaction().replace(R.id.container, playerFragment).commit();
         }
     }
 

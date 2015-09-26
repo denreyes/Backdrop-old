@@ -19,51 +19,63 @@
                 android:id="@+id/text_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:fontFamily="sans-serif-black"
-                android:text="Title"
-                android:paddingTop="14dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerHorizontal="true"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:paddingTop="14dp"
+                android:text="Title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
             <TextView
                 android:id="@+id/text_artist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/text_title"
+                android:layout_centerHorizontal="true"
                 android:fontFamily="sans-serif"
                 android:text="Artist"
-                android:textColor="@color/primary"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_below="@+id/text_title"
-                android:layout_centerHorizontal="true" />
+                android:textColor="@color/primary" />
 
         </RelativeLayout>
 
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/img_album_art"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            app:placeholderImage="@color/light_gray" />
+            android:layout_weight="2">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:layout_weight="3">
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/img_album_art"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:placeholderImage="@color/light_gray" />
 
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/ic_play" />
-        </RelativeLayout>
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/img_filter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:paddingBottom="?attr/actionBarSize">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/ic_play" />
+            </RelativeLayout>
+
+        </FrameLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/edge_keyline"
+            android:layout_marginTop="@dimen/edge_keyline"
             android:fontFamily="sans-serif-medium"
             android:text="Next Track:"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
@@ -79,75 +91,7 @@
             android:text="Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@color/light_gray" />
-
-        <!--<com.facebook.drawee.view.SimpleDraweeView-->
-        <!--android:id="@+id/img_album_art"-->
-        <!--android:layout_width="65dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_gravity="center_vertical"-->
-        <!--fresco:placeholderImage="@color/light_gray" />-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/text_title"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_marginLeft="@dimen/edge_keyline"-->
-        <!--android:layout_toEndOf="@+id/img_album_art"-->
-        <!--android:layout_toRightOf="@+id/img_album_art"-->
-        <!--android:fontFamily="sans-serif-black"-->
-        <!--android:paddingTop="14dp"-->
-        <!--android:text="Title"-->
-        <!--android:textSize="18sp"-->
-        <!--android:textColor="@color/white"/>-->
-
-        <!--<LinearLayout-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:textAppearance="@style/Base.TextAppearance.AppCompat.Caption"-->
-        <!--android:layout_below="@+id/text_title"-->
-        <!--android:layout_alignLeft="@+id/text_title"-->
-        <!--android:layout_alignStart="@+id/text_title">-->
-        <!--<TextView-->
-        <!--android:id="@+id/text_artist"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:fontFamily="sans-serif"-->
-        <!--android:text="Artist"-->
-        <!--android:textColor="@color/white" />-->
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:fontFamily="sans-serif"-->
-        <!--android:textColor="@color/primary"-->
-        <!--android:text=" | " />-->
-        <!--<TextView-->
-        <!--android:id="@+id/text_playlist"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:fontFamily="sans-serif"-->
-        <!--android:text="Artist"-->
-        <!--android:textColor="@color/white" />-->
-        <!--</LinearLayout>-->
-
-        <!--<com.facebook.drawee.view.SimpleDraweeView-->
-        <!--android:id="@+id/img_btn_control"-->
-        <!--android:layout_width="30dp"-->
-        <!--android:layout_height="30dp"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_gravity="center_vertical"-->
-        <!--android:layout_marginEnd="@dimen/edge_keyline"-->
-        <!--android:layout_marginRight="@dimen/edge_keyline"-->
-        <!--android:src="@drawable/ic_play" />-->
-
     </LinearLayout>
-
 
 
     <android.support.design.widget.FloatingActionButton

@@ -74,7 +74,7 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.bind(this, rootView);
-        Intent intent = getActivity().getIntent();
+        Bundle args = getArguments();
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
@@ -85,12 +85,12 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
         mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
         mSpotify = mApi.getService();
 
-        ((PlayerActivity) getActivity()).setSupportActionBar(mToolbar);
-        ((PlayerActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((PlayerActivity) getActivity()).getSupportActionBar().setTitle(intent.getStringExtra("PLAYLIST_TITLE"));
-        mImgAlbumArt.setImageURI(Uri.parse(intent.getStringExtra("PLAYLIST_IMG")));
-        playlist_id = intent.getStringExtra("PLAYLIST_ID");
-        mixer = intent.getStringExtra("PLAYLIST_MIXER");
+        ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(args.getString("PLAYLIST_TITLE"));
+        mImgAlbumArt.setImageURI(Uri.parse(args.getString("PLAYLIST_IMG")));
+        playlist_id = args.getString("PLAYLIST_ID");
+        mixer = args.getString("PLAYLIST_MIXER");
 
         mSlidingLayout.setPanelSlideListener(this);
         getChildFragmentManager().beginTransaction()
