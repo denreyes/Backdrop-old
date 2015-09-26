@@ -12,7 +12,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -43,18 +46,17 @@ import retrofit.client.Response;
 /**
  * Created by Dj on 9/24/2015.
  */
-public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.PanelSlideListener{
+public class PlayerFragment extends Fragment {
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
     @Bind(R.id.recycler_playlist)
     RecyclerView mRecyclerPlaylist;
     @Bind(R.id.img_album_art)
     SimpleDraweeView mImgAlbumArt;
-    @Bind(R.id.sliding_layout)
-    SlidingUpPanelLayout mSlidingLayout;
 
     SharedPreferences prefToken, prefPlaylist;
     PlaylistAdapter mAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
     private SpotifyApi mApi;
     private SpotifyService mSpotify;
     protected RecyclerView.LayoutManager mLayoutManager;
@@ -86,21 +88,36 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
         mSpotify = mApi.getService();
 
         ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
-        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(args.getString("PLAYLIST_TITLE"));
         mImgAlbumArt.setImageURI(Uri.parse(args.getString("PLAYLIST_IMG")));
         playlist_id = args.getString("PLAYLIST_ID");
         mixer = args.getString("PLAYLIST_MIXER");
 
-        mSlidingLayout.setPanelSlideListener(this);
-        getChildFragmentManager().beginTransaction()
-                .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
-
         setRecyclerViewLayoutManager(mLayoutManagerType);
+        initNav();
 
         fetchPlaylistTracks();
-
         return rootView;
+    }
+
+    private void initNav() {
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        DrawerLayout drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+        if (navigationView != null) {
+            mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, mToolbar,
+                    R.string.drawer_open, R.string.drawer_close) {
+                public void onDrawerClosed(View view) {
+                    super.onDrawerClosed(view);
+                }
+
+                /** Called when a drawer has settled in a completely open state. */
+                public void onDrawerOpened(View drawerView) {
+                    super.onDrawerOpened(drawerView);
+                }
+            };
+            drawerLayout.setDrawerListener(mDrawerToggle);
+            mDrawerToggle.syncState();
+        }
     }
 
     public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
@@ -119,7 +136,7 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
     }
 
     private void fetchPlaylistTracks() {
-        if(!prefPlaylist.getString("PLAYLIST_ID","").equals(playlist_id)) {
+        if (!prefPlaylist.getString("PLAYLIST_ID", "").equals(playlist_id)) {
             mSpotify.getPlaylistTracks(mixer, playlist_id, new Callback<Pager<PlaylistTrack>>() {
                 @Override
                 public void success(final Pager<PlaylistTrack> playlistTrackPager, final Response response) {
@@ -168,7 +185,7 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
 
                 }
             });
-        }else{
+        } else {
             SQLiteDatabase db = new TracksDBHelper(getActivity()).getWritableDatabase();
             Cursor cursor = db.query(
                     TracksContract.TracksEntry.TABLE_NAME,
@@ -190,30 +207,5 @@ public class PlayerFragment extends Fragment implements SlidingUpPanelLayout.Pan
             mAdapter = new PlaylistAdapter(list, playlist_id);
             mRecyclerPlaylist.setAdapter(mAdapter);
         }
-    }
-
-    //Controller Methods
-    @Override
-    public void onPanelSlide(View view, float v) {
-    }
-
-    @Override
-    public void onPanelCollapsed(View view) {
-        getChildFragmentManager().beginTransaction()
-                .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
-    }
-
-    @Override
-    public void onPanelExpanded(View view) {
-        getChildFragmentManager().beginTransaction()
-                .replace(R.id.controller_container, new MaximizedControllerFragment()).commit();
-    }
-
-    @Override
-    public void onPanelAnchored(View view) {
-    }
-
-    @Override
-    public void onPanelHidden(View view) {
     }
 }

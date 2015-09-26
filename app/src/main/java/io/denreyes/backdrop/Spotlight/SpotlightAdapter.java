@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,8 +70,9 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
 
             PlayerFragment playerFragment = new PlayerFragment();
             playerFragment.setArguments(bundle);
-            ((MainActivity)context).getSupportFragmentManager()
-                    .beginTransaction().replace(R.id.container, playerFragment).commit();
+            FragmentTransaction ft = ((MainActivity) context).getSupportFragmentManager().beginTransaction();
+            ft.addToBackStack(playerFragment.getClass().getName());
+            ft.replace(R.id.container, playerFragment).commit();
         }
     }
 

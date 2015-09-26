@@ -2,61 +2,62 @@ package io.denreyes.backdrop;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-
-import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import io.denreyes.backdrop.Spotlight.SpotlightAdapter;
-import io.denreyes.backdrop.Spotlight.SpotlightModel;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
-import kaaes.spotify.webapi.android.models.FeaturedPlaylists;
 import kaaes.spotify.webapi.android.models.User;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SlidingUpPanelLayout.PanelSlideListener {
+    @Bind(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+    @Bind(R.id.nav_view)
+    NavigationView navigationView;
+    @Bind(R.id.sliding_layout)
+    SlidingUpPanelLayout mSlidingLayout;
+    private SpotifyApi mApi;
+    private SpotifyService mSpotify;
+
+    private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
+    String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_container);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        SharedPreferences prefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
+        mApi = new SpotifyApi();
+        mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
+        mSpotify = mApi.getService();
 
+        initNav();
         getSupportFragmentManager().beginTransaction().replace(R.id.container, new SpotlightFragment()).commit();
+        mSlidingLayout.setPanelSlideListener(this);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
     }
 
     @Override
@@ -88,5 +89,67 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             return false;
         }
+    }
+    @Bind(R.id.username)
+    TextView mTextNavUser;
+
+    private void initNav() {
+        setupDrawerContent(navigationView);
+
+        mSpotify.getMe(new Callback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                username = user.display_name;
+                MAIN_THREAD.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTextNavUser.setText(username);
+                    }
+                });
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    }
+                });
+    }
+
+    //Controller Methods
+    @Override
+    public void onPanelSlide(View view, float v) {
+    }
+
+    @Override
+    public void onPanelCollapsed(View view) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
+    }
+
+    @Override
+    public void onPanelExpanded(View view) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.controller_container, new MaximizedControllerFragment()).commit();
+    }
+
+    @Override
+    public void onPanelAnchored(View view) {
+
+    }
+
+    @Override
+    public void onPanelHidden(View view) {
     }
 }
