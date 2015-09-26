@@ -13,4 +13,16 @@
     <string name="logout">Log out</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+
+    <!--http://www.freesound.org/people/pulswelle/sounds/194204/-->
+    <string name="rain_link">http://www.freesound.org/data/previews/194/194204_2367966-lq.mp3</string>
+    <!--http://www.freesound.org/people/soundslikewillem/sounds/264347/-->
+    <string name="coffee_link">http://www.freesound.org/data/previews/264/264347_2977451-lq.mp3</string>
+    <!--http://www.freesound.org/people/crooner/sounds/250677/-->
+    <string name="thunder_link">http://www.freesound.org/data/previews/250/250677_149018-lq.mp3</string>
+    <!--http://www.freesound.org/people/leonelmail/sounds/243008/-->
+    <string name="park_link">http://www.freesound.org/data/previews/243/243008_4437257-lq.mp3</string>
+    <string name="waves_link">http://www.freesound.org/data/previews/60/60507_649468-lq.mp3</string>
+    <!--http://www.freesound.org/people/Greg%20Baumont/sounds/90202/-->
+    <string name="diner_link">http://www.freesound.org/data/previews/90/90202_8238-lq.mp3</string>
 </resources>

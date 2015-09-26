@@ -1,5 +1,6 @@
 package io.denreyes.backdrop;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,11 +15,12 @@ import android.widget.ImageView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.denreyes.backdrop.Ambience.AmbientService;
 
 /**
  * Created by DJ on 8/29/2015.
  */
-public class AmbientActivity extends AppCompatActivity{
+public class AmbientActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +58,11 @@ public class AmbientActivity extends AppCompatActivity{
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_ambient,container,false);
+            View rootView = inflater.inflate(R.layout.fragment_ambient, container, false);
             ButterKnife.bind(this, rootView);
             ((AmbientActivity) getActivity()).setSupportActionBar(mToolbar);
-            ((AmbientActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            ((AmbientActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ((AmbientActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ((AmbientActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
             mPrefAmbience = getActivity().getSharedPreferences("AMBIENCE_PREF", MODE_PRIVATE);
 
             activatePrev();
@@ -69,68 +71,117 @@ public class AmbientActivity extends AppCompatActivity{
         }
 
         @OnClick(R.id.img_rain)
-        public void goRain(){
+        public void goRain() {
             activateSwitch(KEY_RAIN);
         }
 
         @OnClick(R.id.img_cafe)
-        public void goCafe(){
+        public void goCafe() {
             activateSwitch(KEY_CAFE);
         }
 
         @OnClick(R.id.img_storm)
-        public void goStorm(){
+        public void goStorm() {
             activateSwitch(KEY_STORM);
         }
 
         @OnClick(R.id.img_park)
-        public void goPark(){
+        public void goPark() {
             activateSwitch(KEY_PARK);
         }
 
         @OnClick(R.id.img_waves)
-        public void goWaves(){
+        public void goWaves() {
             activateSwitch(KEY_WAVES);
         }
 
         @OnClick(R.id.img_diner)
-        public void goDiner(){
+        public void goDiner() {
             activateSwitch(KEY_DINER);
         }
 
-        private void activateSwitch(int key){
-            if(mPrefAmbience != null){
-                int prevKey = mPrefAmbience.getInt("AMBIENCE",-1);
-                switch (prevKey){
-                    case 0:mImageRain.setImageResource(R.drawable.img_ambient_rain);break;
-                    case 1:mImageCafe.setImageResource(R.drawable.img_ambient_cafe);break;
-                    case 2:mImageStorm.setImageResource(R.drawable.img_ambient_storm);break;
-                    case 3:mImagePark.setImageResource(R.drawable.img_ambient_park);break;
-                    case 4:mImageWaves.setImageResource(R.drawable.img_ambient_night);break;
-                    case 5:mImageDiner.setImageResource(R.drawable.img_ambient_diner);break;
+        private void activateSwitch(int key) {
+            if (mPrefAmbience != null) {
+                int prevKey = mPrefAmbience.getInt("AMBIENCE", -1);
+                switch (prevKey) {
+                    case 0:
+                        mImageRain.setImageResource(R.drawable.img_ambient_rain);
+                        break;
+                    case 1:
+                        mImageCafe.setImageResource(R.drawable.img_ambient_cafe);
+                        break;
+                    case 2:
+                        mImageStorm.setImageResource(R.drawable.img_ambient_storm);
+                        break;
+                    case 3:
+                        mImagePark.setImageResource(R.drawable.img_ambient_park);
+                        break;
+                    case 4:
+                        mImageWaves.setImageResource(R.drawable.img_ambient_night);
+                        break;
+                    case 5:
+                        mImageDiner.setImageResource(R.drawable.img_ambient_diner);
+                        break;
                 }
             }
 
             mPrefAmbience.edit().putInt("AMBIENCE", key).apply();
-            switch (key){
-                case 0:mImageRain.setImageResource(R.drawable.img_activated_rain);break;
-                case 1:mImageCafe.setImageResource(R.drawable.img_activated_cafe);break;
-                case 2:mImageStorm.setImageResource(R.drawable.img_activated_storm);break;
-                case 3:mImagePark.setImageResource(R.drawable.img_activated_park);break;
-                case 4:mImageWaves.setImageResource(R.drawable.img_activated_night);break;
-                case 5:mImageDiner.setImageResource(R.drawable.img_activated_diner);break;
+            int resId = 0;
+            switch (key) {
+                case 0:
+                    mImageRain.setImageResource(R.drawable.img_activated_rain);
+                    resId = R.string.rain_link;
+                    break;
+                case 1:
+                    mImageCafe.setImageResource(R.drawable.img_activated_cafe);
+                    resId = R.string.coffee_link;
+                    break;
+                case 2:
+                    mImageStorm.setImageResource(R.drawable.img_activated_storm);
+                    resId = R.string.thunder_link;
+                    break;
+                case 3:
+                    mImagePark.setImageResource(R.drawable.img_activated_park);
+                    resId = R.string.park_link;
+                    break;
+                case 4:
+                    mImageWaves.setImageResource(R.drawable.img_activated_night);
+                    resId = R.string.waves_link;
+                    break;
+                case 5:
+                    mImageDiner.setImageResource(R.drawable.img_activated_diner);
+                    resId = R.string.diner_link;
+                    break;
+            }
+
+            if (resId != 0) {
+                Intent i = new Intent(getActivity(), AmbientService.class);
+                i.putExtra("AUDIO_LINK", getString(resId));
+                getActivity().startService(i);
             }
         }
 
-        private void activatePrev(){
-            int prevKey = mPrefAmbience.getInt("AMBIENCE",-1);
-            switch (prevKey){
-                case 0:mImageRain.setImageResource(R.drawable.img_activated_rain);break;
-                case 1:mImageCafe.setImageResource(R.drawable.img_activated_cafe);break;
-                case 2:mImageStorm.setImageResource(R.drawable.img_activated_storm);break;
-                case 3:mImagePark.setImageResource(R.drawable.img_activated_park);break;
-                case 4:mImageWaves.setImageResource(R.drawable.img_activated_night);break;
-                case 5:mImageDiner.setImageResource(R.drawable.img_activated_diner);break;
+        private void activatePrev() {
+            int prevKey = mPrefAmbience.getInt("AMBIENCE", -1);
+            switch (prevKey) {
+                case 0:
+                    mImageRain.setImageResource(R.drawable.img_activated_rain);
+                    break;
+                case 1:
+                    mImageCafe.setImageResource(R.drawable.img_activated_cafe);
+                    break;
+                case 2:
+                    mImageStorm.setImageResource(R.drawable.img_activated_storm);
+                    break;
+                case 3:
+                    mImagePark.setImageResource(R.drawable.img_activated_park);
+                    break;
+                case 4:
+                    mImageWaves.setImageResource(R.drawable.img_activated_night);
+                    break;
+                case 5:
+                    mImageDiner.setImageResource(R.drawable.img_activated_diner);
+                    break;
             }
         }
     }
