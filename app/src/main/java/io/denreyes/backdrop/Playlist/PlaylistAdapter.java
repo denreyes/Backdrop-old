@@ -17,17 +17,23 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.spotify.sdk.android.player.Config;
+import com.spotify.sdk.android.player.PlayConfig;
 import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.PlayerState;
+import com.spotify.sdk.android.player.PlayerStateCallback;
 import com.spotify.sdk.android.player.Spotify;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.denreyes.backdrop.PlayerFragment;
 import io.denreyes.backdrop.R;
+import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
+import retrofit.Callback;
 
 /**
  * Created by DJ on 8/29/2015.
@@ -50,6 +56,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
         private SharedPreferences prefPlaylist, prefToken, prefPlayedPos;
         private Player mPlayer;
+        private ArrayList<String> songs;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -72,12 +79,20 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
                     Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
                 }
             });
+
+            songs = new ArrayList<>();
+            for (int x=0;x<mList.size();x++){
+                songs.add("spotify:track:" + mList.get(x).track_id);
+            }
         }
 
         @Override
         public void onClick(View v) {
-            mPlayer.play("spotify:track:" + mList.get(getPosition()).track_id);
-            updateController(mList,getPosition());
+            PlayConfig config = PlayConfig.createFor(songs);
+            config.withTrackIndex(getPosition());
+            mPlayer.play(config);
+            mPlayer.skipToNext();
+            updateController(mList, getPosition());
 
             //New Playlist Played
             if (!prefPlaylist.getString("PLAYLIST_ID", "").equals(playlistId))
