@@ -19,6 +19,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.PlayConfig;
 import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.PlayerNotificationCallback;
 import com.spotify.sdk.android.player.PlayerState;
 import com.spotify.sdk.android.player.PlayerStateCallback;
 import com.spotify.sdk.android.player.Spotify;
@@ -91,12 +92,40 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             PlayConfig config = PlayConfig.createFor(songs);
             config.withTrackIndex(getPosition());
             mPlayer.play(config);
-            mPlayer.skipToNext();
-            updateController(mList, getPosition());
+            mPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
+                @Override
+                public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
+                    if (eventType == EventType.TRACK_CHANGED) {
+
+//                        if(isClicked==false) {
+                        updateController(mList, getTrackPosition(playerState.trackUri));
+//                        }
+
+//                        isClicked = false;
+//                        ctr = 2;
+
+//                        Toast.makeText(context,"HEY",Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onPlaybackError(ErrorType errorType, String s) {
+                    Toast.makeText(context, "err", Toast.LENGTH_LONG).show();
+                }
+            });
 
             //New Playlist Played
             if (!prefPlaylist.getString("PLAYLIST_ID", "").equals(playlistId))
                 playlistDbUpdate();
+        }
+
+        private int getTrackPosition(String trackUri) {
+            for(int x=0;x<mList.size();x++){
+                Log.v(LOG_TAG,mList.get(x).track_id+", "+trackUri);
+                if(("spotify:track:"+mList.get(x).track_id).equals(trackUri))
+                    return x;
+            }
+            return 0;
         }
 
         private void playlistDbUpdate() {

@@ -3,6 +3,7 @@ package io.denreyes.backdrop;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,9 +17,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.Bind;
@@ -41,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     private SpotifyService mSpotify;
 
     private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
-    String username;
+    String username, profileUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     }
     @Bind(R.id.username)
     TextView mTextNavUser;
+    @Bind(R.id.img_profile)
+    SimpleDraweeView mImgProfile;
 
     private void initNav() {
         setupDrawerContent(navigationView);
@@ -100,10 +105,12 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             @Override
             public void success(User user, Response response) {
                 username = user.display_name;
+                profileUrl = user.images.get(0).url;
                 MAIN_THREAD.post(new Runnable() {
                     @Override
                     public void run() {
                         mTextNavUser.setText(username);
+                        mImgProfile.setImageURI(Uri.parse(profileUrl));
                     }
                 });
             }
