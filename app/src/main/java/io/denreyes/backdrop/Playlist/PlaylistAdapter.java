@@ -55,8 +55,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         @Bind(R.id.img_album_art)
         SimpleDraweeView mImgAlbumArt;
 
-        private SharedPreferences prefPlaylist, prefToken, prefPlayedPos;
-        private Player mPlayer;
+        private SharedPreferences prefPlaylist, prefPlayedPos;
         private ArrayList<String> songs;
 
         public ViewHolder(View itemView) {
@@ -66,66 +65,17 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             itemView.setOnClickListener(this);
             prefPlayedPos = context.getSharedPreferences("PLAYED_POS_PREF", context.MODE_PRIVATE);
             prefPlaylist = context.getSharedPreferences("PLAYLIST_PREF", context.MODE_PRIVATE);
-            prefToken = context.getSharedPreferences("ACCESS_TOKEN_PREF", context.MODE_PRIVATE);
-            Config playerConfig = new Config(context, prefToken.getString("ACCESS_TOKEN", ""),
-                    context.getString(R.string.spotify_client_id));
-
-            mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
-                @Override
-                public void onInitialized(Player player) {
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-                    Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
-                }
-            });
 
             songs = new ArrayList<>();
-            for (int x=0;x<mList.size();x++){
-                songs.add("spotify:track:" + mList.get(x).track_id);
-            }
         }
 
         @Override
         public void onClick(View v) {
-            PlayConfig config = PlayConfig.createFor(songs);
-            config.withTrackIndex(getPosition());
-            mPlayer.play(config);
-            mPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
-                @Override
-                public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
-                    if (eventType == EventType.TRACK_CHANGED) {
-
-//                        if(isClicked==false) {
-                        updateController(mList, getTrackPosition(playerState.trackUri));
-//                        }
-
-//                        isClicked = false;
-//                        ctr = 2;
-
-//                        Toast.makeText(context,"HEY",Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onPlaybackError(ErrorType errorType, String s) {
-                    Toast.makeText(context, "err", Toast.LENGTH_LONG).show();
-                }
-            });
+            updateController(mList);
 
             //New Playlist Played
             if (!prefPlaylist.getString("PLAYLIST_ID", "").equals(playlistId))
                 playlistDbUpdate();
-        }
-
-        private int getTrackPosition(String trackUri) {
-            for(int x=0;x<mList.size();x++){
-                Log.v(LOG_TAG,mList.get(x).track_id+", "+trackUri);
-                if(("spotify:track:"+mList.get(x).track_id).equals(trackUri))
-                    return x;
-            }
-            return 0;
         }
 
         private void playlistDbUpdate() {
@@ -143,12 +93,16 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             }
         }
 
-        public void updateController(ArrayList<PlaylistModel> list, int position) {
-            prefPlayedPos.edit().putInt("PLAYED_POS",position+1).apply();
+        public void updateController(ArrayList<PlaylistModel> list) {
+            prefPlayedPos.edit().putInt("PLAYED_POS",getPosition()+1).apply();
+            for (int x=0;x<mList.size();x++){
+                songs.add("spotify:track:" + mList.get(x).track_id);
+            }
 
             Intent intent = new Intent(BROADCAST_PLAYLIST_DATA);
             intent.putParcelableArrayListExtra("LIST_TRACKS", list);
-            intent.putExtra("TRACK_POSITION", position);
+            intent.putExtra("TRACK_POSITION", getPosition());
+            intent.putStringArrayListExtra("LIST_SONGS", songs);
             context.sendBroadcast(intent);
         }
     }
@@ -173,7 +127,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         holder.mTextTitle.setText(mList.get(position).title);
         holder.mTextArtist.setText("by " + mList.get(position).artist);
         holder.mImgAlbumArt.setImageURI(Uri.parse(mList.get(position).img_url));
-        Log.v("HEYY", position + ", " + holder.mTextTitle);
     }
 
     @Override
