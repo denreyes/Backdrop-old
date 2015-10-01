@@ -1,5 +1,6 @@
 package io.denreyes.backdrop;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.denreyes.backdrop.Playlist.PlaylistAdapter;
 import io.denreyes.backdrop.Playlist.PlaylistModel;
 import io.denreyes.backdrop.Playlist.TracksContract;
@@ -39,18 +42,20 @@ import io.denreyes.backdrop.Playlist.TracksDBHelper;
 /**
  * Created by Dj on 9/23/2015.
  */
-public class MinimizedControllerFragment extends Fragment {
+public class MinimizedControllerFragment extends Fragment{
     @Bind(R.id.text_title)
     TextView mTextTitle;
     @Bind(R.id.text_artist)
     TextView mTextArtist;
     @Bind(R.id.img_album_art)
     SimpleDraweeView mImgArt;
-    private boolean mBroadcastIsRegistered;
+    @Bind(R.id.img_btn_control)
+    ImageView mImgPausePlay;
+    private boolean mNextBroadcastIsRegistered;
     private SharedPreferences prefPlayedPos, prefToken;
-    private Player mPlayer;
     private int pos;
-    ArrayList<PlaylistModel> model;
+    private boolean isPlaying;
+    OnPausePlay mCallback;
 
     @Nullable
     @Override
@@ -63,20 +68,6 @@ public class MinimizedControllerFragment extends Fragment {
         if (pos != -1) {
             populateFromDb(pos);
         }
-
-        Config playerConfig = new Config(getActivity(), prefToken.getString("ACCESS_TOKEN", ""),
-                getActivity().getString(R.string.spotify_client_id));
-        mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
-            @Override
-            public void onInitialized(Player player) {
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
-            }
-        });
-
         return rootView;
     }
 
@@ -96,52 +87,56 @@ public class MinimizedControllerFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (mBroadcastIsRegistered) {
+        if (mNextBroadcastIsRegistered) {
             getActivity().unregisterReceiver(tracksReceiver);
-            mBroadcastIsRegistered = false;
+            mNextBroadcastIsRegistered = false;
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (!mBroadcastIsRegistered) {
+        if (!mNextBroadcastIsRegistered) {
             getActivity().registerReceiver(tracksReceiver,
-                    new IntentFilter(PlaylistAdapter.BROADCAST_PLAYLIST_DATA));
-            mBroadcastIsRegistered = true;
+                    new IntentFilter(MainActivity.BROADCAST_NEXT_TRACK));
+            mNextBroadcastIsRegistered = true;
         }
     }
 
     private BroadcastReceiver tracksReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            model = intent.getParcelableArrayListExtra("LIST_TRACKS");
-            int newPos = intent.getIntExtra("TRACK_POSITION", -1);
-            PlayConfig config = PlayConfig.createFor(intent.getStringArrayListExtra("LIST_SONGS"));
-            config.withTrackIndex(newPos);
-            mPlayer.play(config);
-            mPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
-                @Override
-                public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
-                    if (eventType == EventType.TRACK_CHANGED) {
-                        populateFromDb(getTrackPosition(playerState.trackUri, model) + 1);
-                    }
-                }
-
-                @Override
-                public void onPlaybackError(ErrorType errorType, String s) {
-                    Toast.makeText(getActivity(), "err", Toast.LENGTH_LONG).show();
-                }
-            });
+            populateFromDb(intent.getIntExtra("POSITION",-1));
+            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            isPlaying = true;
         }
     };
 
-    private int getTrackPosition(String trackUri, ArrayList<PlaylistModel> list) {
-        for (int x = 0; x < list.size(); x++) {
-            if (("spotify:track:" + list.get(x).track_id).equals(trackUri)) {
-                return x;
-            }
+    @OnClick(R.id.img_btn_control)
+    public void onPausePlayClicked(){
+        mCallback.onPausePlay(isPlaying);
+        if(isPlaying) {
+            mImgPausePlay.setImageResource(R.drawable.ic_play);
+            isPlaying = false;
         }
-        return 0;
+        else {
+            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            isPlaying = true;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (MainActivity) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
+    public interface OnPausePlay{
+        public void onPausePlay(boolean bool);
     }
 }

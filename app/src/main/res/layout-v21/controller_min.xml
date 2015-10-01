@@ -72,6 +72,7 @@
         android:layout_marginEnd="@dimen/edge_keyline"
         android:layout_marginRight="@dimen/edge_keyline"
         android:clickable="true"
+        android:background="?android:selectableItemBackgroundBorderless"
         android:src="@drawable/ic_play" />
 
 </RelativeLayout>
