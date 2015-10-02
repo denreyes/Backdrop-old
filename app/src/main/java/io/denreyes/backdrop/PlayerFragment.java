@@ -35,6 +35,7 @@ import io.denreyes.backdrop.Playlist.PlaylistAdapter;
 import io.denreyes.backdrop.Playlist.PlaylistModel;
 import io.denreyes.backdrop.Playlist.TracksContract;
 import io.denreyes.backdrop.Playlist.TracksDBHelper;
+import io.denreyes.backdrop.Spotlight.SpotlightAdapter;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Pager;
@@ -66,6 +67,7 @@ public class PlayerFragment extends Fragment {
     protected LayoutManagerType mLayoutManagerType;
 
     private static String playlist_id, mixer;
+    private ArrayList<PlaylistModel> mList;
 
     private enum LayoutManagerType {
         LINEAR_LAYOUT_MANAGER
@@ -77,6 +79,10 @@ public class PlayerFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.bind(this, rootView);
 
+        if(savedInstanceState!=null) {
+            mList = savedInstanceState.getParcelableArrayList("PLAYLIST_LIST");
+        }
+
         initPreferences();
         initSpotify();
         initToolbar();
@@ -86,6 +92,12 @@ public class PlayerFragment extends Fragment {
         setRecyclerViewLayoutManager(mLayoutManagerType);
         fetchPlaylistTracks();
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("PLAYLIST_LIST", mList);
     }
 
     private void initLayoutManager() {
@@ -149,6 +161,7 @@ public class PlayerFragment extends Fragment {
     }
 
     private void fetchPlaylistTracks() {
+        if(mList == null) {
         if (!prefPlaylist.getString("PLAYLIST_ID", "").equals(playlist_id)) {
             mSpotify.getPlaylistTracks(mixer, playlist_id, new Callback<Pager<PlaylistTrack>>() {
                 @Override
@@ -160,7 +173,7 @@ public class PlayerFragment extends Fragment {
 
                             if (playlistSize != 0) {
                                 String trackTitle, trackArtist, trackImg, trackId;
-                                ArrayList<PlaylistModel> list = new ArrayList<PlaylistModel>();
+                                mList = new ArrayList<PlaylistModel>();
                                 for (int x = 0; x < playlistSize; x++) {
                                     trackTitle = playlistTrackPager.items.get(x).track.name;
 
@@ -170,9 +183,9 @@ public class PlayerFragment extends Fragment {
 
                                     trackImg = playlistTrackPager.items.get(x).track.album.images.get(1).url;
                                     trackId = playlistTrackPager.items.get(x).track.id;
-                                    list.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
+                                    mList.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
                                 }
-                                mAdapter = new PlaylistAdapter(list, playlist_id);
+                                mAdapter = new PlaylistAdapter(mList, playlist_id);
 
                                 MAIN_THREAD.post(new Runnable() {
                                     @Override
@@ -198,8 +211,12 @@ public class PlayerFragment extends Fragment {
 
                 }
             });
-        } else {
+        } else
             fetchFromDb();
+
+        } else {
+            mAdapter = new PlaylistAdapter(mList, playlist_id);
+            mRecyclerPlaylist.setAdapter(mAdapter);
         }
     }
 

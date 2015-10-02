@@ -61,12 +61,17 @@ public class SpotlightFragment extends Fragment {
 
     private ActionBarDrawerToggle mDrawerToggle;
     private SpotlightAdapter mAdapter;
+    private ArrayList<SpotlightModel> mList;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
+
+        if(savedInstanceState!=null) {
+            mList = savedInstanceState.getParcelableArrayList("SPOTLIGHT_LIST");
+        }
 
         initPreferences();
         initSpotify();
@@ -81,6 +86,12 @@ public class SpotlightFragment extends Fragment {
     public void onStart() {
         super.onStart();
         initBackdropImg();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("SPOTLIGHT_LIST",mList);
     }
 
     private void initPreferences() {
@@ -161,52 +172,57 @@ public class SpotlightFragment extends Fragment {
     }
 
     private void fetchFeaturedPlaylists() {
-        mProgressBar.setVisibility(View.VISIBLE);
-        mSpotify.getFeaturedPlaylists(new Callback<FeaturedPlaylists>() {
-            @Override
-            public void success(FeaturedPlaylists featuredPlaylists, Response response) {
-                int playlistSize = featuredPlaylists.playlists.items.size();
+        if(mList == null) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mSpotify.getFeaturedPlaylists(new Callback<FeaturedPlaylists>() {
+                @Override
+                public void success(FeaturedPlaylists featuredPlaylists, Response response) {
+                    int playlistSize = featuredPlaylists.playlists.items.size();
+                    mList = new ArrayList<SpotlightModel>();
 
-                if (playlistSize != 0) {
-                    String spotifyId, playlistTitle, playlistMixer, playlistImg;
-                    ArrayList<SpotlightModel> list = new ArrayList<SpotlightModel>();
-                    for (int x = 0; x < playlistSize; x++) {
-                        spotifyId = featuredPlaylists.playlists.items.get(x).id;
-                        playlistTitle = featuredPlaylists.playlists.items.get(x).name;
-                        playlistMixer = featuredPlaylists.playlists.items.get(x).owner.id;
-                        playlistImg = featuredPlaylists.playlists.items.get(x).images.get(0).url;
-                        list.add(new SpotlightModel(spotifyId, playlistTitle, playlistMixer, playlistImg));
-                    }
-                    mAdapter = new SpotlightAdapter(list);
-
-                    MAIN_THREAD.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerSpotlight.setAdapter(mAdapter);
-                            mProgressBar.setVisibility(View.GONE);
+                    if (playlistSize != 0) {
+                        String spotifyId, playlistTitle, playlistMixer, playlistImg;
+                        for (int x = 0; x < playlistSize; x++) {
+                            spotifyId = featuredPlaylists.playlists.items.get(x).id;
+                            playlistTitle = featuredPlaylists.playlists.items.get(x).name;
+                            playlistMixer = featuredPlaylists.playlists.items.get(x).owner.id;
+                            playlistImg = featuredPlaylists.playlists.items.get(x).images.get(0).url;
+                            mList.add(new SpotlightModel(spotifyId, playlistTitle, playlistMixer, playlistImg));
                         }
-                    });
-                } else {
+                        mAdapter = new SpotlightAdapter(mList);
+
+                        MAIN_THREAD.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRecyclerSpotlight.setAdapter(mAdapter);
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+                        });
+                    } else {
+                        MAIN_THREAD.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), "Couldn't get Playlists", Toast.LENGTH_LONG).show();
+                                mRecyclerSpotlight.setAdapter(null);
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
                     MAIN_THREAD.post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getActivity(), "Couldn't get Playlists", Toast.LENGTH_LONG).show();
-                            mRecyclerSpotlight.setAdapter(null);
-                            mProgressBar.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), "Can't access the web", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                MAIN_THREAD.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity(), "Can't access the web", Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
+            });
+        } else {
+            mAdapter = new SpotlightAdapter(mList);
+            mRecyclerSpotlight.setAdapter(mAdapter);
+        }
     }
 }

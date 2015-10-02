@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -84,8 +85,13 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
         initNav();
         initBottomController();
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, new SpotlightFragment()).commit();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, new SpotlightFragment()).commit();
+        } else {
+            username = savedInstanceState.getString("USERNAME");
+            profileUrl = savedInstanceState.getString("PROFILE_URL");
+        }
     }
 
     @Override
@@ -118,6 +124,13 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString("USERNAME",username);
+        outState.putString("PROFILE_URL",profileUrl);
+    }
+
     private BroadcastReceiver tracksReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -126,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             PlayConfig config = PlayConfig.createFor(intent.getStringArrayListExtra("LIST_SONGS"));
             config.withTrackIndex(newPos);
             mPlayer.play(config);
-            prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
+            prefIsPlaying.edit().putBoolean("IS_PLAYING", true).apply();
             mPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
                 @Override
                 public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
@@ -134,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
                         int newPos = getTrackPosition(playerState.trackUri, model) + 1;
                         Intent i = new Intent(BROADCAST_NEXT_TRACK);
                         i.putExtra("POSITION", newPos);
-                        prefPlayedPos.edit().putInt("PLAYED_POS",newPos).apply();
+                        prefPlayedPos.edit().putInt("PLAYED_POS", newPos).apply();
                         sendBroadcast(i);
                     }
                 }
@@ -149,9 +162,13 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     private BroadcastReceiver skipReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch (intent.getIntExtra("SKIP_SWITCH",-1)) {
-                case 0: mPlayer.skipToPrevious(); break;
-                case 1: mPlayer.skipToNext(); break;
+            switch (intent.getIntExtra("SKIP_SWITCH", -1)) {
+                case 0:
+                    mPlayer.skipToPrevious();
+                    break;
+                case 1:
+                    mPlayer.skipToNext();
+                    break;
             }
         }
     };
@@ -197,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     }
 
 
-
     private void initPreferences() {
         prefToken = getSharedPreferences("ACCESS_PREF", MODE_PRIVATE);
         prefIsPlaying = getSharedPreferences("IS_PLAYING_PREF", MODE_PRIVATE);
@@ -226,25 +242,30 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     private void initNav() {
         setupDrawerContent(navigationView);
 
-        mSpotify.getMe(new Callback<User>() {
-            @Override
-            public void success(User user, Response response) {
-                username = user.display_name;
-                profileUrl = user.images.get(0).url;
-                MAIN_THREAD.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mTextNavUser.setText(username);
-                        mImgProfile.setImageURI(Uri.parse(profileUrl));
-                    }
-                });
-            }
+        if (username == null)
+            mSpotify.getMe(new Callback<User>() {
+                @Override
+                public void success(User user, Response response) {
+                    username = user.display_name;
+                    profileUrl = user.images.get(0).url;
+                    MAIN_THREAD.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTextNavUser.setText(username);
+                            mImgProfile.setImageURI(Uri.parse(profileUrl));
+                        }
+                    });
+                }
 
-            @Override
-            public void failure(RetrofitError error) {
+                @Override
+                public void failure(RetrofitError error) {
 //                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
-            }
-        });
+                }
+            });
+        else{
+            mTextNavUser.setText(username);
+            mImgProfile.setImageURI(Uri.parse(profileUrl));
+        }
     }
 
     private void initBottomController() {
@@ -272,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             prefIsPlaying.edit().putBoolean("IS_PLAYING", false).apply();
         } else {
             mPlayer.resume();
-            prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
+            prefIsPlaying.edit().putBoolean("IS_PLAYING", true).apply();
         }
     }
 
