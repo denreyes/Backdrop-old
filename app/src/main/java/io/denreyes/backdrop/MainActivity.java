@@ -48,7 +48,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class MainActivity extends AppCompatActivity implements SlidingUpPanelLayout.PanelSlideListener,
-        MinimizedControllerFragment.OnPausePlay {
+        MinimizedControllerFragment.OnPausePlay, MaximizedControllerFragment.OnPausePlay {
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @Bind(R.id.nav_view)
@@ -265,4 +265,9 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     public void onPanelHidden(View view) {
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        prefIsPlaying.edit().putBoolean("IS_PLAYING", false).apply();
+    }
 }

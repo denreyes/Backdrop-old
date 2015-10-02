@@ -67,6 +67,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_centerHorizontal="true"
+                    android:background="?android:selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:src="@drawable/ic_play" />
             </RelativeLayout>
