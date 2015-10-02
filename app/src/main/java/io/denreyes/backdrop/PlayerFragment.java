@@ -95,7 +95,7 @@ public class PlayerFragment extends Fragment {
 
     private void initPreferences() {
         prefPlaylist = getActivity().getSharedPreferences("PLAYLIST_PREF", getActivity().MODE_PRIVATE);
-        prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", getActivity().MODE_PRIVATE);
+        prefToken = getActivity().getSharedPreferences("ACCESS_PREF", getActivity().MODE_PRIVATE);
     }
 
     private void initToolbar() {

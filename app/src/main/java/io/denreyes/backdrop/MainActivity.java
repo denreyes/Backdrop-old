@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
         }
 
         if (mSkipBroadcastIsRegistered) {
-            this.unregisterReceiver(tracksReceiver);
+            this.unregisterReceiver(skipReceiver);
             mSkipBroadcastIsRegistered = false;
         }
     }
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
 
 
     private void initPreferences() {
-        prefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
+        prefToken = getSharedPreferences("ACCESS_PREF", MODE_PRIVATE);
         prefIsPlaying = getSharedPreferences("IS_PLAYING_PREF", MODE_PRIVATE);
         prefPlayedPos = getSharedPreferences("PLAYED_POS_PREF", MODE_PRIVATE);
     }
@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
 
             @Override
             public void failure(RetrofitError error) {
-                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -84,7 +84,7 @@ public class SpotlightFragment extends Fragment {
     }
 
     private void initPreferences() {
-        prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", getActivity().MODE_PRIVATE);
+        prefToken = getActivity().getSharedPreferences("ACCESS_PREF", getActivity().MODE_PRIVATE);
     }
 
     private void initSpotify() {
