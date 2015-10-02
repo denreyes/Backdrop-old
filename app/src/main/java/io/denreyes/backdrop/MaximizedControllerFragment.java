@@ -43,6 +43,7 @@ public class MaximizedControllerFragment extends Fragment {
     SimpleDraweeView mImgFilter;
     @Bind(R.id.img_btn_pauseplay)
     ImageView mImgPausePlay;
+    public static final String BROADCAST_SKIP_TRACK = "io.denreyes.backdrop.skiptrack";
     private boolean mNextBroadcastIsRegistered;
     private SharedPreferences prefPlayedPos, prefIsPlaying;
     private int pos;
@@ -107,7 +108,7 @@ public class MaximizedControllerFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             populateFromDb(intent.getIntExtra("POSITION", -1));
-            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
             isPlaying = prefIsPlaying.getBoolean("IS_PLAYING",false);
         }
     };
@@ -117,12 +118,26 @@ public class MaximizedControllerFragment extends Fragment {
         mCallback.onPausePlay(isPlaying);
         if(isPlaying) {
             mImgPausePlay.setImageResource(R.drawable.ic_big_play);
-            isPlaying = false;
         }
         else {
             mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
-            isPlaying = true;
         }
+    }
+
+    @OnClick(R.id.img_btn_next)
+    public void onNextClicked(){
+        Intent intent = new Intent(BROADCAST_SKIP_TRACK);
+        intent.putExtra("SKIP_SWITCH", 1);
+        getActivity().sendBroadcast(intent);
+        isPlaying = true;
+    }
+
+    @OnClick(R.id.img_btn_prev)
+    public void onPrevClicked(){
+        Intent intent = new Intent(BROADCAST_SKIP_TRACK);
+        intent.putExtra("SKIP_SWITCH", 0);
+        getActivity().sendBroadcast(intent);
+        isPlaying = true;
     }
 
     @Override

@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     private SpotifyService mSpotify;
     private Player mPlayer;
     private boolean mTracksBroadcastIsRegistered;
-    private SharedPreferences prefIsPlaying, prefToken;
+    private boolean mSkipBroadcastIsRegistered;
+    private SharedPreferences prefPlayedPos, prefIsPlaying, prefToken;
 
     private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
     public static final String BROADCAST_NEXT_TRACK = "io.denreyes.backdrop.nexttrack";
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
         ButterKnife.bind(this);
         prefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
         prefIsPlaying = getSharedPreferences("IS_PLAYING_PREF",MODE_PRIVATE);
+        prefPlayedPos = getSharedPreferences("PLAYED_POS_PREF", MODE_PRIVATE);
         mApi = new SpotifyApi();
         mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
         mSpotify = mApi.getService();
@@ -104,6 +106,11 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             this.unregisterReceiver(tracksReceiver);
             mTracksBroadcastIsRegistered = false;
         }
+
+        if (mSkipBroadcastIsRegistered) {
+            this.unregisterReceiver(tracksReceiver);
+            mSkipBroadcastIsRegistered = false;
+        }
     }
 
     @Override
@@ -113,6 +120,12 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             this.registerReceiver(tracksReceiver,
                     new IntentFilter(PlaylistAdapter.BROADCAST_PLAYLIST_DATA));
             mTracksBroadcastIsRegistered = true;
+        }
+
+        if (!mSkipBroadcastIsRegistered) {
+            this.registerReceiver(skipReceiver,
+                    new IntentFilter(MaximizedControllerFragment.BROADCAST_SKIP_TRACK));
+            mSkipBroadcastIsRegistered = true;
         }
     }
 
@@ -125,14 +138,15 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             PlayConfig config = PlayConfig.createFor(intent.getStringArrayListExtra("LIST_SONGS"));
             config.withTrackIndex(newPos);
             mPlayer.play(config);
-//            isPlaying = true;
             prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
             mPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
                 @Override
                 public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
                     if (eventType == EventType.TRACK_CHANGED) {
+                        int newPos = getTrackPosition(playerState.trackUri, model) + 1;
                         Intent i = new Intent(BROADCAST_NEXT_TRACK);
-                        i.putExtra("POSITION", getTrackPosition(playerState.trackUri, model) + 1);
+                        i.putExtra("POSITION", newPos);
+                        prefPlayedPos.edit().putInt("PLAYED_POS",newPos).apply();
                         sendBroadcast(i);
                     }
                 }
@@ -141,6 +155,16 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
                 public void onPlaybackError(ErrorType errorType, String s) {
                 }
             });
+        }
+    };
+
+    private BroadcastReceiver skipReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getIntExtra("SKIP_SWITCH",-1)) {
+                case 0: mPlayer.skipToPrevious(); break;
+                case 1: mPlayer.skipToNext(); break;
+            }
         }
     };
 
@@ -158,11 +182,9 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     public void onPausePlay(boolean bool) {
         if (bool) {
             mPlayer.pause();
-//            isPlaying = false;
             prefIsPlaying.edit().putBoolean("IS_PLAYING", false).apply();
         } else {
             mPlayer.resume();
-//            isPlaying = true;
             prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
         }
     }
