@@ -41,7 +41,7 @@ public class MaximizedControllerFragment extends Fragment {
     SimpleDraweeView mImgArt;
     @Bind(R.id.img_filter)
     SimpleDraweeView mImgFilter;
-    @Bind(R.id.img_btn_control)
+    @Bind(R.id.img_btn_pauseplay)
     ImageView mImgPausePlay;
     private boolean mNextBroadcastIsRegistered;
     private SharedPreferences prefPlayedPos, prefIsPlaying;
@@ -61,7 +61,7 @@ public class MaximizedControllerFragment extends Fragment {
             populateFromDb(pos);
         }
         if(prefIsPlaying.getBoolean("IS_PLAYING",false)) {
-            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
             isPlaying = true;
         }
 
@@ -112,15 +112,15 @@ public class MaximizedControllerFragment extends Fragment {
         }
     };
 
-    @OnClick(R.id.img_btn_control)
+    @OnClick(R.id.img_btn_pauseplay)
     public void onPausePlayClicked(){
         mCallback.onPausePlay(isPlaying);
         if(isPlaying) {
-            mImgPausePlay.setImageResource(R.drawable.ic_play);
+            mImgPausePlay.setImageResource(R.drawable.ic_big_play);
             isPlaying = false;
         }
         else {
-            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
             isPlaying = true;
         }
     }
