@@ -47,7 +47,8 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends AppCompatActivity implements SlidingUpPanelLayout.PanelSlideListener, MinimizedControllerFragment.OnPausePlay {
+public class MainActivity extends AppCompatActivity implements SlidingUpPanelLayout.PanelSlideListener,
+        MinimizedControllerFragment.OnPausePlay {
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @Bind(R.id.nav_view)
@@ -58,19 +59,20 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     private SpotifyService mSpotify;
     private Player mPlayer;
     private boolean mTracksBroadcastIsRegistered;
+    private SharedPreferences prefIsPlaying, prefToken;
 
     private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
     public static final String BROADCAST_NEXT_TRACK = "io.denreyes.backdrop.nexttrack";
     ArrayList<PlaylistModel> model;
     String username, profileUrl;
-    boolean isPlaying;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        SharedPreferences prefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
+        prefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
+        prefIsPlaying = getSharedPreferences("IS_PLAYING_PREF",MODE_PRIVATE);
         mApi = new SpotifyApi();
         mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
         mSpotify = mApi.getService();
@@ -123,7 +125,8 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             PlayConfig config = PlayConfig.createFor(intent.getStringArrayListExtra("LIST_SONGS"));
             config.withTrackIndex(newPos);
             mPlayer.play(config);
-            isPlaying = true;
+//            isPlaying = true;
+            prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
             mPlayer.addPlayerNotificationCallback(new PlayerNotificationCallback() {
                 @Override
                 public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
@@ -155,10 +158,12 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     public void onPausePlay(boolean bool) {
         if (bool) {
             mPlayer.pause();
-            isPlaying = false;
+//            isPlaying = false;
+            prefIsPlaying.edit().putBoolean("IS_PLAYING", false).apply();
         } else {
             mPlayer.resume();
-            isPlaying = true;
+//            isPlaying = true;
+            prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
         }
     }
 

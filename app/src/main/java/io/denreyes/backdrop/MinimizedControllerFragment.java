@@ -52,7 +52,7 @@ public class MinimizedControllerFragment extends Fragment{
     @Bind(R.id.img_btn_control)
     ImageView mImgPausePlay;
     private boolean mNextBroadcastIsRegistered;
-    private SharedPreferences prefPlayedPos, prefToken;
+    private SharedPreferences prefPlayedPos, prefIsPlaying;
     private int pos;
     private boolean isPlaying;
     OnPausePlay mCallback;
@@ -62,11 +62,15 @@ public class MinimizedControllerFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.controller_min, container, false);
         ButterKnife.bind(this, rootView);
+        prefIsPlaying = getActivity().getSharedPreferences("IS_PLAYING_PREF", getActivity().MODE_PRIVATE);
         prefPlayedPos = getActivity().getSharedPreferences("PLAYED_POS_PREF", getActivity().MODE_PRIVATE);
-        prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", getActivity().MODE_PRIVATE);
         pos = prefPlayedPos.getInt("PLAYED_POS", -1);
         if (pos != -1) {
             populateFromDb(pos);
+        }
+        if(prefIsPlaying.getBoolean("IS_PLAYING",false)) {
+            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            isPlaying = true;
         }
         return rootView;
     }
@@ -106,9 +110,9 @@ public class MinimizedControllerFragment extends Fragment{
     private BroadcastReceiver tracksReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            populateFromDb(intent.getIntExtra("POSITION",-1));
+            populateFromDb(intent.getIntExtra("POSITION", -1));
             mImgPausePlay.setImageResource(R.drawable.ic_pause);
-            isPlaying = true;
+            isPlaying = prefIsPlaying.getBoolean("IS_PLAYING",false);
         }
     };
 
