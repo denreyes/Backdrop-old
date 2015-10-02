@@ -51,41 +51,22 @@ public class MinimizedControllerFragment extends Fragment{
     SimpleDraweeView mImgArt;
     @Bind(R.id.img_btn_control)
     ImageView mImgPausePlay;
-    private boolean mNextBroadcastIsRegistered;
+
+    private OnPausePlay mCallback;
+
     private SharedPreferences prefPlayedPos, prefIsPlaying;
+
+    private boolean mNextBroadcastIsRegistered, isPlaying;
     private int pos;
-    private boolean isPlaying;
-    OnPausePlay mCallback;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.controller_min, container, false);
         ButterKnife.bind(this, rootView);
-        prefIsPlaying = getActivity().getSharedPreferences("IS_PLAYING_PREF", getActivity().MODE_PRIVATE);
-        prefPlayedPos = getActivity().getSharedPreferences("PLAYED_POS_PREF", getActivity().MODE_PRIVATE);
-        pos = prefPlayedPos.getInt("PLAYED_POS", -1);
-        if (pos != -1) {
-            populateFromDb(pos);
-        }
-        if(prefIsPlaying.getBoolean("IS_PLAYING",false)) {
-            mImgPausePlay.setImageResource(R.drawable.ic_pause);
-            isPlaying = true;
-        }
+        initPreferences();
+        initIsPlayingViews();
         return rootView;
-    }
-
-    private void populateFromDb(int pos) {
-        SQLiteDatabase db = new TracksDBHelper(getActivity()).getWritableDatabase();
-        Cursor cursor = db.query(
-                TracksContract.TracksEntry.TABLE_NAME,
-                null, null, null, null, null, null, null
-        );
-        cursor.move(pos);
-
-        mTextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
-        mTextArtist.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST)));
-        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL))));
     }
 
     @Override
@@ -104,6 +85,17 @@ public class MinimizedControllerFragment extends Fragment{
             getActivity().registerReceiver(tracksReceiver,
                     new IntentFilter(MainActivity.BROADCAST_NEXT_TRACK));
             mNextBroadcastIsRegistered = true;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (MainActivity) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
         }
     }
 
@@ -129,15 +121,33 @@ public class MinimizedControllerFragment extends Fragment{
         }
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallback = (MainActivity) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
+    private void initPreferences() {
+        prefIsPlaying = getActivity().getSharedPreferences("IS_PLAYING_PREF", getActivity().MODE_PRIVATE);
+        prefPlayedPos = getActivity().getSharedPreferences("PLAYED_POS_PREF", getActivity().MODE_PRIVATE);
+    }
+
+    private void initIsPlayingViews() {
+        pos = prefPlayedPos.getInt("PLAYED_POS", -1);
+        if(pos != -1){
+            populateFromDb(pos);
         }
+        if(prefIsPlaying.getBoolean("IS_PLAYING",false)) {
+            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            isPlaying = true;
+        }
+    }
+
+    private void populateFromDb(int pos) {
+        SQLiteDatabase db = new TracksDBHelper(getActivity()).getWritableDatabase();
+        Cursor cursor = db.query(
+                TracksContract.TracksEntry.TABLE_NAME,
+                null, null, null, null, null, null, null
+        );
+        cursor.move(pos);
+
+        mTextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
+        mTextArtist.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST)));
+        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL))));
     }
 
     public interface OnPausePlay{

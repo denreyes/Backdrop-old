@@ -54,20 +54,20 @@ public class PlayerFragment extends Fragment {
     @Bind(R.id.img_album_art)
     SimpleDraweeView mImgAlbumArt;
 
-    SharedPreferences prefToken, prefPlaylist;
-    PlaylistAdapter mAdapter;
-    private ActionBarDrawerToggle mDrawerToggle;
+    private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
+
     private SpotifyApi mApi;
     private SpotifyService mSpotify;
+
+    private SharedPreferences prefToken, prefPlaylist;
+    private PlaylistAdapter mAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
     protected RecyclerView.LayoutManager mLayoutManager;
     protected LayoutManagerType mLayoutManagerType;
-    private boolean mBroadcastIsRegistered;
-    private final String LOG_TAG = PlayerFragment.class.getSimpleName();
-    private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
-    String playlist_id, mixer;
+
+    private static String playlist_id, mixer;
 
     private enum LayoutManagerType {
-        GRID_LAYOUT_MANAGER,
         LINEAR_LAYOUT_MANAGER
     }
 
@@ -76,28 +76,41 @@ public class PlayerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.bind(this, rootView);
-        Bundle args = getArguments();
 
+        initPreferences();
+        initSpotify();
+        initToolbar();
+        initLayoutManager();
+        initNav();
+
+        setRecyclerViewLayoutManager(mLayoutManagerType);
+        fetchPlaylistTracks();
+        return rootView;
+    }
+
+    private void initLayoutManager() {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
+    }
 
+    private void initPreferences() {
         prefPlaylist = getActivity().getSharedPreferences("PLAYLIST_PREF", getActivity().MODE_PRIVATE);
         prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", getActivity().MODE_PRIVATE);
-        mApi = new SpotifyApi();
-        mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
-        mSpotify = mApi.getService();
+    }
 
+    private void initToolbar() {
+        Bundle args = getArguments();
         ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(args.getString("PLAYLIST_TITLE"));
         mImgAlbumArt.setImageURI(Uri.parse(args.getString("PLAYLIST_IMG")));
         playlist_id = args.getString("PLAYLIST_ID");
         mixer = args.getString("PLAYLIST_MIXER");
+    }
 
-        setRecyclerViewLayoutManager(mLayoutManagerType);
-        initNav();
-
-        fetchPlaylistTracks();
-        return rootView;
+    private void initSpotify() {
+        mApi = new SpotifyApi();
+        mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
+        mSpotify = mApi.getService();
     }
 
     private void initNav() {
@@ -186,26 +199,30 @@ public class PlayerFragment extends Fragment {
                 }
             });
         } else {
-            SQLiteDatabase db = new TracksDBHelper(getActivity()).getWritableDatabase();
-            Cursor cursor = db.query(
-                    TracksContract.TracksEntry.TABLE_NAME,
-                    null, null, null, null, null, null
-            );
-            cursor.moveToFirst();
-
-            String trackTitle, trackArtist, trackImg, trackId;
-            ArrayList<PlaylistModel> list = new ArrayList<PlaylistModel>();
-            for (int x = 0; x < cursor.getCount(); x++) {
-                trackTitle = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE));
-                trackArtist = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST));
-                trackImg = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL));
-                trackId = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_SPOTIFY_ID));
-                list.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
-
-                cursor.moveToNext();
-            }
-            mAdapter = new PlaylistAdapter(list, playlist_id);
-            mRecyclerPlaylist.setAdapter(mAdapter);
+            fetchFromDb();
         }
+    }
+
+    private void fetchFromDb(){
+        SQLiteDatabase db = new TracksDBHelper(getActivity()).getWritableDatabase();
+        Cursor cursor = db.query(
+                TracksContract.TracksEntry.TABLE_NAME,
+                null, null, null, null, null, null
+        );
+        cursor.moveToFirst();
+
+        String trackTitle, trackArtist, trackImg, trackId;
+        ArrayList<PlaylistModel> list = new ArrayList<PlaylistModel>();
+        for (int x = 0; x < cursor.getCount(); x++) {
+            trackTitle = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE));
+            trackArtist = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST));
+            trackImg = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL));
+            trackId = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_SPOTIFY_ID));
+            list.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
+
+            cursor.moveToNext();
+        }
+        mAdapter = new PlaylistAdapter(list, playlist_id);
+        mRecyclerPlaylist.setAdapter(mAdapter);
     }
 }

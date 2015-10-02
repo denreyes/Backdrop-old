@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.api.client.auth.oauth2.RefreshTokenRequest;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -44,8 +45,6 @@ public class LoginActivity extends AppCompatActivity implements
     SimpleDraweeView mImgBg;
 
     private Player mPlayer;
-    // Request code that will be used to verify if the result comes from correct activity
-// Can be any integer
     private static final int REQUEST_CODE = 1337;
     private static String mTrackId = "";
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
@@ -63,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements
                 .build();
         mImgBg.setController(controller);
 
-        mPrefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
+        mPrefToken = getSharedPreferences("ACCESS_PREF", MODE_PRIVATE);
     }
 
     @OnClick(R.id.btn_login)
@@ -86,7 +85,8 @@ public class LoginActivity extends AppCompatActivity implements
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 mPrefToken.edit().putString("ACCESS_TOKEN", response.getAccessToken()).apply();
-                startActivity(new Intent(this,MainActivity.class));
+                mPrefToken.edit().putString("ACCESS_PREF", response.getCode()).apply();
+                startActivity(new Intent(this, MainActivity.class));
             }
         }
     }

@@ -43,28 +43,22 @@ public class MaximizedControllerFragment extends Fragment {
     SimpleDraweeView mImgFilter;
     @Bind(R.id.img_btn_pauseplay)
     ImageView mImgPausePlay;
+
     public static final String BROADCAST_SKIP_TRACK = "io.denreyes.backdrop.skiptrack";
-    private boolean mNextBroadcastIsRegistered;
+
     private SharedPreferences prefPlayedPos, prefIsPlaying;
+    private OnPausePlay mCallback;
+
+    private boolean mNextBroadcastIsRegistered,isPlaying;
     private int pos;
-    private boolean isPlaying;
-    OnPausePlay mCallback;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.controller_max, container, false);
         ButterKnife.bind(this, rootView);
-        prefIsPlaying = getActivity().getSharedPreferences("IS_PLAYING_PREF", getActivity().MODE_PRIVATE);
-        prefPlayedPos = getActivity().getSharedPreferences("PLAYED_POS_PREF", getActivity().MODE_PRIVATE);
-        pos = prefPlayedPos.getInt("PLAYED_POS", -1);
-        if(pos != -1){
-            populateFromDb(pos);
-        }
-        if(prefIsPlaying.getBoolean("IS_PLAYING",false)) {
-            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
-            isPlaying = true;
-        }
+        initPreferences();
+        initIsPlayingViews();
 
         mImgFilter.getHierarchy().setPlaceholderImage(R.drawable.filter_black);
 
@@ -104,6 +98,17 @@ public class MaximizedControllerFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (MainActivity) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
     private BroadcastReceiver tracksReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -140,14 +145,19 @@ public class MaximizedControllerFragment extends Fragment {
         isPlaying = true;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallback = (MainActivity) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
+    private void initPreferences() {
+        prefIsPlaying = getActivity().getSharedPreferences("IS_PLAYING_PREF", getActivity().MODE_PRIVATE);
+        prefPlayedPos = getActivity().getSharedPreferences("PLAYED_POS_PREF", getActivity().MODE_PRIVATE);
+    }
+
+    private void initIsPlayingViews() {
+        pos = prefPlayedPos.getInt("PLAYED_POS", -1);
+        if(pos != -1){
+            populateFromDb(pos);
+        }
+        if(prefIsPlaying.getBoolean("IS_PLAYING",false)) {
+            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
+            isPlaying = true;
         }
     }
 

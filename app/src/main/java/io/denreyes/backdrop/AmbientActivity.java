@@ -32,7 +32,6 @@ public class AmbientActivity extends AppCompatActivity {
     public static class AmbientFragment extends Fragment {
         @Bind(R.id.toolbar)
         Toolbar mToolbar;
-
         @Bind(R.id.img_rain)
         ImageView mImageRain;
         @Bind(R.id.img_cafe)
@@ -46,14 +45,14 @@ public class AmbientActivity extends AppCompatActivity {
         @Bind(R.id.img_diner)
         ImageView mImageDiner;
 
-        SharedPreferences mPrefAmbience;
-
         private static int KEY_RAIN = 0;
         private static int KEY_CAFE = 1;
         private static int KEY_STORM = 2;
         private static int KEY_PARK = 3;
         private static int KEY_WAVES = 4;
         private static int KEY_DINER = 5;
+
+        private SharedPreferences mPrefAmbience;
 
         @Nullable
         @Override

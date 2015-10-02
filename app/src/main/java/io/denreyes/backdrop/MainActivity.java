@@ -55,48 +55,37 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
     NavigationView navigationView;
     @Bind(R.id.sliding_layout)
     SlidingUpPanelLayout mSlidingLayout;
+    @Bind(R.id.username)
+    TextView mTextNavUser;
+    @Bind(R.id.img_profile)
+    SimpleDraweeView mImgProfile;
+
+    public static final String BROADCAST_NEXT_TRACK = "io.denreyes.backdrop.nexttrack";
+    private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
+
     private SpotifyApi mApi;
     private SpotifyService mSpotify;
     private Player mPlayer;
-    private boolean mTracksBroadcastIsRegistered;
-    private boolean mSkipBroadcastIsRegistered;
+
     private SharedPreferences prefPlayedPos, prefIsPlaying, prefToken;
 
-    private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
-    public static final String BROADCAST_NEXT_TRACK = "io.denreyes.backdrop.nexttrack";
-    ArrayList<PlaylistModel> model;
-    String username, profileUrl;
+    private static ArrayList<PlaylistModel> model;
+    private static String username, profileUrl;
+    private static boolean mTracksBroadcastIsRegistered;
+    private static boolean mSkipBroadcastIsRegistered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        prefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
-        prefIsPlaying = getSharedPreferences("IS_PLAYING_PREF",MODE_PRIVATE);
-        prefPlayedPos = getSharedPreferences("PLAYED_POS_PREF", MODE_PRIVATE);
-        mApi = new SpotifyApi();
-        mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
-        mSpotify = mApi.getService();
-
+        initPreferences();
+        initSpotify();
         initNav();
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, new SpotlightFragment()).commit();
-        mSlidingLayout.setPanelSlideListener(this);
+        initBottomController();
+
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
-
-        Config playerConfig = new Config(this, prefToken.getString("ACCESS_TOKEN", ""),
-                this.getString(R.string.spotify_client_id));
-        mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
-            @Override
-            public void onInitialized(Player player) {
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
-            }
-        });
+                .replace(R.id.container, new SpotlightFragment()).commit();
     }
 
     @Override
@@ -128,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             mSkipBroadcastIsRegistered = true;
         }
     }
-
 
     private BroadcastReceiver tracksReceiver = new BroadcastReceiver() {
         @Override
@@ -168,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
         }
     };
 
-
     private int getTrackPosition(String trackUri, ArrayList<PlaylistModel> list) {
         for (int x = 0; x < list.size(); x++) {
             if (("spotify:track:" + list.get(x).track_id).equals(trackUri)) {
@@ -176,17 +163,6 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
             }
         }
         return 0;
-    }
-
-    @Override
-    public void onPausePlay(boolean bool) {
-        if (bool) {
-            mPlayer.pause();
-            prefIsPlaying.edit().putBoolean("IS_PLAYING", false).apply();
-        } else {
-            mPlayer.resume();
-            prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
-        }
     }
 
     @Override
@@ -220,10 +196,32 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
         }
     }
 
-    @Bind(R.id.username)
-    TextView mTextNavUser;
-    @Bind(R.id.img_profile)
-    SimpleDraweeView mImgProfile;
+
+
+    private void initPreferences() {
+        prefToken = getSharedPreferences("ACCESS_TOKEN_PREF", MODE_PRIVATE);
+        prefIsPlaying = getSharedPreferences("IS_PLAYING_PREF", MODE_PRIVATE);
+        prefPlayedPos = getSharedPreferences("PLAYED_POS_PREF", MODE_PRIVATE);
+    }
+
+    private void initSpotify() {
+        mApi = new SpotifyApi();
+        mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
+        mSpotify = mApi.getService();
+
+        Config playerConfig = new Config(this, prefToken.getString("ACCESS_TOKEN", ""),
+                this.getString(R.string.spotify_client_id));
+        mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
+            @Override
+            public void onInitialized(Player player) {
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+            }
+        });
+    }
 
     private void initNav() {
         setupDrawerContent(navigationView);
@@ -249,6 +247,12 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
         });
     }
 
+    private void initBottomController() {
+        mSlidingLayout.setPanelSlideListener(this);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.controller_container, new MinimizedControllerFragment()).commit();
+    }
+
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -259,6 +263,17 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
                         return true;
                     }
                 });
+    }
+
+    @Override
+    public void onPausePlay(boolean bool) {
+        if (bool) {
+            mPlayer.pause();
+            prefIsPlaying.edit().putBoolean("IS_PLAYING", false).apply();
+        } else {
+            mPlayer.resume();
+            prefIsPlaying.edit().putBoolean("IS_PLAYING",true).apply();
+        }
     }
 
     //Controller Methods
@@ -285,11 +300,5 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
 
     @Override
     public void onPanelHidden(View view) {
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        prefIsPlaying.edit().putBoolean("IS_PLAYING", false).apply();
     }
 }

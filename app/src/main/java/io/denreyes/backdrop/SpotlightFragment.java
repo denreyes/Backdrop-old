@@ -52,33 +52,26 @@ public class SpotlightFragment extends Fragment {
     @Bind(R.id.progress_bar)
     ProgressBar mProgressBar;
 
-    private ActionBarDrawerToggle mDrawerToggle;
-    private SpotlightAdapter mAdapter;
+    private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
+
     private SpotifyApi mApi;
     private SpotifyService mSpotify;
-    String username;
 
-    private final String LOG_TAG = SpotlightFragment.class.getSimpleName();
-    private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
+    private SharedPreferences prefToken;
+
+    private ActionBarDrawerToggle mDrawerToggle;
+    private SpotlightAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
-        SharedPreferences prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", getActivity().MODE_PRIVATE);
-        mApi = new SpotifyApi();
-        mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
-        mSpotify = mApi.getService();
 
-        ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
-        ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        StaggeredGridLayoutManager sglm =
-                new StaggeredGridLayoutManager(getResources().getInteger(R.integer.list_column_count),
-                        StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerSpotlight.setLayoutManager(sglm);
-        initNav();
+        initPreferences();
+        initSpotify();
+        initToolbar();
+        initLayoutManager();
 
         fetchFeaturedPlaylists();
         return rootView;
@@ -89,6 +82,30 @@ public class SpotlightFragment extends Fragment {
         super.onStart();
         initBackdropImg();
     }
+
+    private void initPreferences() {
+        prefToken = getActivity().getSharedPreferences("ACCESS_TOKEN_PREF", getActivity().MODE_PRIVATE);
+    }
+
+    private void initSpotify() {
+        mApi = new SpotifyApi();
+        mApi = mApi.setAccessToken(prefToken.getString("ACCESS_TOKEN", ""));
+        mSpotify = mApi.getService();
+    }
+
+    private void initToolbar() {
+        ((MainActivity) getActivity()).setSupportActionBar(mToolbar);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+    private void initLayoutManager() {
+        StaggeredGridLayoutManager sglm =
+                new StaggeredGridLayoutManager(getResources().getInteger(R.integer.list_column_count),
+                        StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerSpotlight.setLayoutManager(sglm);
+        initNav();
+    }
+
 
     private void initBackdropImg() {
         SharedPreferences mPrefAmbience = getActivity().getSharedPreferences("AMBIENCE_PREF", getActivity(). MODE_PRIVATE);
