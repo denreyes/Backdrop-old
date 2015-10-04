@@ -33,6 +33,12 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <provider
+            android:name=".datum.CoreProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false"
+            android:syncable="true" />
+
         <service
             android:name=".service.AmbientService"
             android:enabled="true" />

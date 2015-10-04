@@ -25,8 +25,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.denreyes.backdrop.MainActivity;
 import io.denreyes.backdrop.R;
-import io.denreyes.backdrop.data.CoreContract;
-import io.denreyes.backdrop.data.CoreDBHelper;
+import io.denreyes.backdrop.datum.CoreContract;
+import io.denreyes.backdrop.datum.CoreDBHelper;
 
 /**
  * Created by Dj on 9/23/2015.
@@ -69,15 +69,15 @@ public class MaximizedControllerFragment extends Fragment {
     private void populateFromDb(int pos) {
         SQLiteDatabase db = new CoreDBHelper(getActivity()).getWritableDatabase();
         Cursor cursor = db.query(
-                io.denreyes.backdrop.data.CoreContract.TracksEntry.TABLE_NAME,
+                CoreContract.TracksEntry.TABLE_NAME,
                 null, null, null, null, null, null, null
         );
         cursor.move(pos);
         mTextTitle.setText(cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_TITLE)));
-        mTextArtist.setText(cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_ARTIST)));
-        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_IMG_URL))));
+        mTextArtist.setText(cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_ARTIST)));
+        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_IMG_URL))));
         if(cursor.moveToNext())
-            mTextNextTitle.setText(cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_TITLE)));
+            mTextNextTitle.setText(cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_TITLE)));
     }
 
     @Override

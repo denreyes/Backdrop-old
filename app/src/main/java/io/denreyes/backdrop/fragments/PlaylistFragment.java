@@ -30,8 +30,7 @@ import io.denreyes.backdrop.MainActivity;
 import io.denreyes.backdrop.R;
 import io.denreyes.backdrop.adapters.PlaylistAdapter;
 import io.denreyes.backdrop.model.PlaylistModel;
-import io.denreyes.backdrop.data.CoreContract;
-import io.denreyes.backdrop.data.CoreDBHelper;
+import io.denreyes.backdrop.datum.CoreContract;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Pager;
@@ -216,21 +215,22 @@ public class PlaylistFragment extends Fragment {
         }
     }
 
-    private void fetchFromDb(){
-        SQLiteDatabase db = new CoreDBHelper(getActivity()).getWritableDatabase();
-        Cursor cursor = db.query(
-                CoreContract.TracksEntry.TABLE_NAME,
-                null, null, null, null, null, null
+    private void fetchFromDb() {
+
+        Cursor cursor = getActivity().getContentResolver().query(
+                CoreContract.TracksEntry.CONTENT_URI,
+                null, null, null, null, null
         );
+
         cursor.moveToFirst();
 
         String trackTitle, trackArtist, trackImg, trackId;
         ArrayList<PlaylistModel> list = new ArrayList<PlaylistModel>();
         for (int x = 0; x < cursor.getCount(); x++) {
-            trackTitle = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_TITLE));
-            trackArtist = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_ARTIST));
-            trackImg = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_IMG_URL));
-            trackId = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_SPOTIFY_ID));
+            trackTitle = cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_TITLE));
+            trackArtist = cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_ARTIST));
+            trackImg = cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_IMG_URL));
+            trackId = cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_SPOTIFY_ID));
             list.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
 
             cursor.moveToNext();

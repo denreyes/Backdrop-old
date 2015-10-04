@@ -1,5 +1,6 @@
 package io.denreyes.backdrop.adapters;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -21,8 +22,7 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.denreyes.backdrop.model.PlaylistModel;
-import io.denreyes.backdrop.data.CoreContract;
-import io.denreyes.backdrop.data.CoreDBHelper;
+import io.denreyes.backdrop.datum.CoreContract;
 import io.denreyes.backdrop.R;
 
 /**
@@ -67,19 +67,24 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
                 playlistDbUpdate();
         }
 
-        private void playlistDbUpdate() {
-            prefPlaylist.edit().putString("PLAYLIST_ID", playlistId).apply();
-            SQLiteDatabase db = new CoreDBHelper(context).getWritableDatabase();
-            db.delete(io.denreyes.backdrop.data.CoreContract.TracksEntry.TABLE_NAME, null, null);
-            ContentValues values = new ContentValues();
-            for (int x = 0; x < getItemCount(); x++) {
-                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_TITLE, mList.get(x).title);
-                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_ARTIST, mList.get(x).artist);
-                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_IMG_URL, mList.get(x).img_url);
-                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_SPOTIFY_ID, mList.get(x).track_id);
 
-                db.insert(CoreContract.TracksEntry.TABLE_NAME, null, values);
-            }
+        private void playlistDbUpdate() {
+            new Thread() {
+                public void run() {
+                    prefPlaylist.edit().putString("PLAYLIST_ID", playlistId).apply();
+                    ContentResolver contentResolver = context.getContentResolver();
+                    contentResolver.delete(CoreContract.TracksEntry.CONTENT_URI, null, null);
+                    ContentValues values = new ContentValues();
+                    for (int x = 0; x < getItemCount(); x++) {
+                        values.put(CoreContract.TracksEntry.TRACK_TITLE, mList.get(x).title);
+                        values.put(CoreContract.TracksEntry.TRACK_ARTIST, mList.get(x).artist);
+                        values.put(CoreContract.TracksEntry.TRACK_IMG_URL, mList.get(x).img_url);
+                        values.put(CoreContract.TracksEntry.TRACK_SPOTIFY_ID, mList.get(x).track_id);
+
+                        contentResolver.insert(CoreContract.TracksEntry.CONTENT_URI,values);
+                    }
+                }
+            }.start();
         }
 
         public void updateController(ArrayList<PlaylistModel> list) {

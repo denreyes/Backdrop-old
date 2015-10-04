@@ -1,4 +1,4 @@
-package io.denreyes.backdrop.data;
+package io.denreyes.backdrop.datum;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
