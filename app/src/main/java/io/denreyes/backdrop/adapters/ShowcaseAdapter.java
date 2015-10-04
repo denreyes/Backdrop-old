@@ -1,5 +1,7 @@
 package io.denreyes.backdrop.adapters;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,18 +22,19 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.denreyes.backdrop.MainActivity;
-import io.denreyes.backdrop.model.SpotlightModel;
+import io.denreyes.backdrop.datum.CoreContract;
+import io.denreyes.backdrop.model.ShowcaseModel;
 import io.denreyes.backdrop.fragments.PlaylistFragment;
 import io.denreyes.backdrop.R;
 
 /**
  * Created by DJ on 8/28/2015.
  */
-public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.ViewHolder> {
-    private static final String LOG_TAG = SpotlightAdapter.class.getSimpleName();
-    private static ArrayList<SpotlightModel> mList;
+public class ShowcaseAdapter extends RecyclerView.Adapter<ShowcaseAdapter.ViewHolder> {
+    private static final String LOG_TAG = ShowcaseAdapter.class.getSimpleName();
+    private static ArrayList<ShowcaseModel> mList;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
+    public class ViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         Context context;
         @Bind(R.id.text_title)
@@ -53,11 +56,32 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
             infoBackground.setVisibility(View.GONE);
             mTextTitle.setVisibility(View.GONE);
             mTextMixer.setVisibility(View.GONE);
+
+            showcaseDbUpdate();
         }
 
         @Override
         public void onClick(View v) {
             switchToPlaylistFragment();
+        }
+
+
+        private void showcaseDbUpdate() {
+            new Thread() {
+                public void run() {
+                    ContentResolver contentResolver = context.getContentResolver();
+                    contentResolver.delete(CoreContract.ShowcaseEntry.CONTENT_URI, null, null);
+                    ContentValues values = new ContentValues();
+                    for (int x = 0; x < getItemCount(); x++) {
+                        values.put(CoreContract.ShowcaseEntry.PLAYLIST_TITLE, mList.get(x).title);
+                        values.put(CoreContract.ShowcaseEntry.PLAYLIST_MIXER, mList.get(x).mixer);
+                        values.put(CoreContract.ShowcaseEntry.PLAYLIST_IMG_URL, mList.get(x).img_url);
+                        values.put(CoreContract.ShowcaseEntry.PLAYLIST_SPOTIFY_ID, mList.get(x).id);
+
+                        contentResolver.insert(CoreContract.ShowcaseEntry.CONTENT_URI,values);
+                    }
+                }
+            }.start();
         }
 
         private void switchToPlaylistFragment() {
@@ -75,12 +99,12 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
         }
     }
 
-    public SpotlightAdapter(ArrayList<SpotlightModel> list) {
+    public ShowcaseAdapter(ArrayList<ShowcaseModel> list) {
         mList = list;
     }
 
     @Override
-    public SpotlightAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ShowcaseAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Fresco.initialize(parent.getContext());
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_spotlight, parent, false);
         view.setFocusable(true);
@@ -89,7 +113,7 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(SpotlightAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(ShowcaseAdapter.ViewHolder holder, int position) {
         Log.d(LOG_TAG, "Element " + position + " set.");
 
 //        holder.mTextTitle.setText(mList.get(position).title);

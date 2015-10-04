@@ -12,6 +12,25 @@ public class CoreContract {
     public static final String CONTENT_AUTHORITY = "io.denreyes.backdrop.app";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
     public static final String PATH_TRACKS = "tracks";
+    public static final String PATH_SHOWCASE = "showcase";
+
+    public static final class ShowcaseEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_SHOWCASE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SHOWCASE;
+
+        public static final String TABLE_NAME = "showcase";
+        public static final String PLAYLIST_TITLE = "title";
+        public static final String PLAYLIST_MIXER = "mixer";
+        public static final String PLAYLIST_IMG_URL = "img";
+        public static final String PLAYLIST_SPOTIFY_ID = "spot_id";
+
+        public static Uri buildTracksUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
 
     public static final class TracksEntry implements BaseColumns {
         public static final Uri CONTENT_URI =

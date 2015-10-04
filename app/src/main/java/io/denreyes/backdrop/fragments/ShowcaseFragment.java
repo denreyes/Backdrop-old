@@ -28,8 +28,8 @@ import butterknife.OnClick;
 import io.denreyes.backdrop.AmbientActivity;
 import io.denreyes.backdrop.MainActivity;
 import io.denreyes.backdrop.R;
-import io.denreyes.backdrop.adapters.SpotlightAdapter;
-import io.denreyes.backdrop.model.SpotlightModel;
+import io.denreyes.backdrop.adapters.ShowcaseAdapter;
+import io.denreyes.backdrop.model.ShowcaseModel;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.FeaturedPlaylists;
@@ -40,7 +40,7 @@ import retrofit.client.Response;
 /**
  * Created by Dj on 9/24/2015.
  */
-public class SpotlightFragment extends Fragment {
+public class ShowcaseFragment extends Fragment {
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
     @Bind(R.id.recycler_spotlight)
@@ -58,8 +58,8 @@ public class SpotlightFragment extends Fragment {
     private SharedPreferences prefToken;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private SpotlightAdapter mAdapter;
-    private ArrayList<SpotlightModel> mList;
+    private ShowcaseAdapter mAdapter;
+    private ArrayList<ShowcaseModel> mList;
 
     @Nullable
     @Override
@@ -176,7 +176,7 @@ public class SpotlightFragment extends Fragment {
                 @Override
                 public void success(FeaturedPlaylists featuredPlaylists, Response response) {
                     int playlistSize = featuredPlaylists.playlists.items.size();
-                    mList = new ArrayList<SpotlightModel>();
+                    mList = new ArrayList<ShowcaseModel>();
 
                     if (playlistSize != 0) {
                         String spotifyId, playlistTitle, playlistMixer, playlistImg;
@@ -185,9 +185,9 @@ public class SpotlightFragment extends Fragment {
                             playlistTitle = featuredPlaylists.playlists.items.get(x).name;
                             playlistMixer = featuredPlaylists.playlists.items.get(x).owner.id;
                             playlistImg = featuredPlaylists.playlists.items.get(x).images.get(0).url;
-                            mList.add(new SpotlightModel(spotifyId, playlistTitle, playlistMixer, playlistImg));
+                            mList.add(new ShowcaseModel(spotifyId, playlistTitle, playlistMixer, playlistImg));
                         }
-                        mAdapter = new SpotlightAdapter(mList);
+                        mAdapter = new ShowcaseAdapter(mList);
 
                         MAIN_THREAD.post(new Runnable() {
                             @Override
@@ -219,7 +219,7 @@ public class SpotlightFragment extends Fragment {
                 }
             });
         } else {
-            mAdapter = new SpotlightAdapter(mList);
+            mAdapter = new ShowcaseAdapter(mList);
             mRecyclerSpotlight.setAdapter(mAdapter);
         }
     }

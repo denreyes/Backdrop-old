@@ -16,7 +16,16 @@ public class CoreDBHelper extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        final String SQL_CREATE_TRACKS_TABLES = "CREATE TABLE " + CoreContract.TracksEntry.TABLE_NAME + " (" +
+
+        final String SQL_CREATE_SHOWCASE_TABLES = "CREATE TABLE " + CoreContract.ShowcaseEntry.TABLE_NAME + " (" +
+                CoreContract.ShowcaseEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                CoreContract.ShowcaseEntry.PLAYLIST_TITLE + " TEXT NOT NULL, " +
+                CoreContract.ShowcaseEntry.PLAYLIST_MIXER + " TEXT NOT NULL, " +
+                CoreContract.ShowcaseEntry.PLAYLIST_IMG_URL + " TEXT NOT NULL, " +
+                CoreContract.ShowcaseEntry.PLAYLIST_SPOTIFY_ID + " TEXT NOT NULL " +
+                " );";
+
+        final String SQL_CREATE_TRACKS_TABLE = "CREATE TABLE " + CoreContract.TracksEntry.TABLE_NAME + " (" +
                 CoreContract.TracksEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 CoreContract.TracksEntry.TRACK_TITLE + " TEXT NOT NULL, " +
                 CoreContract.TracksEntry.TRACK_ARTIST + " TEXT NOT NULL, " +
@@ -24,7 +33,8 @@ public class CoreDBHelper extends SQLiteOpenHelper{
                 CoreContract.TracksEntry.TRACK_SPOTIFY_ID + " TEXT NOT NULL " +
                 " );";
 
-        db.execSQL(SQL_CREATE_TRACKS_TABLES);
+        db.execSQL(SQL_CREATE_SHOWCASE_TABLES);
+        db.execSQL(SQL_CREATE_TRACKS_TABLE);
     }
 
     @Override

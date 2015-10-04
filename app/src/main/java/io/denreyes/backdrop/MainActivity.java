@@ -39,7 +39,7 @@ import butterknife.ButterKnife;
 import io.denreyes.backdrop.adapters.PlaylistAdapter;
 import io.denreyes.backdrop.fragments.MaximizedControllerFragment;
 import io.denreyes.backdrop.fragments.MinimizedControllerFragment;
-import io.denreyes.backdrop.fragments.SpotlightFragment;
+import io.denreyes.backdrop.fragments.ShowcaseFragment;
 import io.denreyes.backdrop.model.PlaylistModel;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, new SpotlightFragment()).commit();
+                    .replace(R.id.container, new ShowcaseFragment()).commit();
         } else {
             username = savedInstanceState.getString("USERNAME");
             profileUrl = savedInstanceState.getString("PROFILE_URL");
