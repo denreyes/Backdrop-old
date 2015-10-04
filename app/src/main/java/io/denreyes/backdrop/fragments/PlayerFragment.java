@@ -1,9 +1,5 @@
-package io.denreyes.backdrop;
+package io.denreyes.backdrop.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,17 +21,17 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import io.denreyes.backdrop.Playlist.PlaylistAdapter;
-import io.denreyes.backdrop.Playlist.PlaylistModel;
-import io.denreyes.backdrop.Playlist.TracksContract;
-import io.denreyes.backdrop.Playlist.TracksDBHelper;
-import io.denreyes.backdrop.Spotlight.SpotlightAdapter;
+import io.denreyes.backdrop.MainActivity;
+import io.denreyes.backdrop.R;
+import io.denreyes.backdrop.adapters.PlaylistAdapter;
+import io.denreyes.backdrop.model.PlaylistModel;
+import io.denreyes.backdrop.data.CoreContract;
+import io.denreyes.backdrop.data.CoreDBHelper;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Pager;
@@ -221,9 +217,9 @@ public class PlayerFragment extends Fragment {
     }
 
     private void fetchFromDb(){
-        SQLiteDatabase db = new TracksDBHelper(getActivity()).getWritableDatabase();
+        SQLiteDatabase db = new CoreDBHelper(getActivity()).getWritableDatabase();
         Cursor cursor = db.query(
-                TracksContract.TracksEntry.TABLE_NAME,
+                CoreContract.TracksEntry.TABLE_NAME,
                 null, null, null, null, null, null
         );
         cursor.moveToFirst();
@@ -231,10 +227,10 @@ public class PlayerFragment extends Fragment {
         String trackTitle, trackArtist, trackImg, trackId;
         ArrayList<PlaylistModel> list = new ArrayList<PlaylistModel>();
         for (int x = 0; x < cursor.getCount(); x++) {
-            trackTitle = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE));
-            trackArtist = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST));
-            trackImg = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL));
-            trackId = cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_SPOTIFY_ID));
+            trackTitle = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_TITLE));
+            trackArtist = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_ARTIST));
+            trackImg = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_IMG_URL));
+            trackId = cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_SPOTIFY_ID));
             list.add(new PlaylistModel(trackTitle, trackArtist, trackImg, trackId));
 
             cursor.moveToNext();

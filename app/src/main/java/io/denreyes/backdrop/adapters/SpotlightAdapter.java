@@ -1,8 +1,6 @@
-package io.denreyes.backdrop.Spotlight;
+package io.denreyes.backdrop.adapters;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -22,7 +20,8 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.denreyes.backdrop.MainActivity;
-import io.denreyes.backdrop.PlayerFragment;
+import io.denreyes.backdrop.model.SpotlightModel;
+import io.denreyes.backdrop.fragments.PlayerFragment;
 import io.denreyes.backdrop.R;
 
 /**

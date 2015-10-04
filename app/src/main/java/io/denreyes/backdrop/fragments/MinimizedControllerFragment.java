@@ -1,4 +1,4 @@
-package io.denreyes.backdrop;
+package io.denreyes.backdrop.fragments;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -17,66 +17,45 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.denreyes.backdrop.Playlist.TracksContract;
-import io.denreyes.backdrop.Playlist.TracksDBHelper;
+import io.denreyes.backdrop.MainActivity;
+import io.denreyes.backdrop.R;
+import io.denreyes.backdrop.data.CoreContract;
+import io.denreyes.backdrop.data.CoreDBHelper;
 
 /**
  * Created by Dj on 9/23/2015.
  */
-public class MaximizedControllerFragment extends Fragment {
+public class MinimizedControllerFragment extends Fragment{
     @Bind(R.id.text_title)
     TextView mTextTitle;
     @Bind(R.id.text_artist)
     TextView mTextArtist;
-    @Bind(R.id.text_next_title)
-    TextView mTextNextTitle;
     @Bind(R.id.img_album_art)
     SimpleDraweeView mImgArt;
-    @Bind(R.id.img_filter)
-    SimpleDraweeView mImgFilter;
-    @Bind(R.id.img_btn_pauseplay)
+    @Bind(R.id.img_btn_control)
     ImageView mImgPausePlay;
 
-    public static final String BROADCAST_SKIP_TRACK = "io.denreyes.backdrop.skiptrack";
-
-    private SharedPreferences prefPlayedPos, prefIsPlaying;
     private OnPausePlay mCallback;
 
-    private boolean mNextBroadcastIsRegistered,isPlaying;
+    private SharedPreferences prefPlayedPos, prefIsPlaying;
+
+    private boolean mNextBroadcastIsRegistered, isPlaying;
     private int pos;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.controller_max, container, false);
+        View rootView = inflater.inflate(R.layout.controller_min, container, false);
         ButterKnife.bind(this, rootView);
         initPreferences();
         initIsPlayingViews();
-
-        mImgFilter.getHierarchy().setPlaceholderImage(R.drawable.filter_black);
-
         return rootView;
-    }
-
-    private void populateFromDb(int pos) {
-        SQLiteDatabase db = new TracksDBHelper(getActivity()).getWritableDatabase();
-        Cursor cursor = db.query(
-                TracksContract.TracksEntry.TABLE_NAME,
-                null, null, null, null, null, null, null
-        );
-        cursor.move(pos);
-        mTextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
-        mTextArtist.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_ARTIST)));
-        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_IMG_URL))));
-        if(cursor.moveToNext())
-            mTextNextTitle.setText(cursor.getString(cursor.getColumnIndex(TracksContract.TracksEntry.TRACK_TITLE)));
     }
 
     @Override
@@ -113,36 +92,22 @@ public class MaximizedControllerFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             populateFromDb(intent.getIntExtra("POSITION", -1));
-            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
+            mImgPausePlay.setImageResource(R.drawable.ic_pause);
             isPlaying = prefIsPlaying.getBoolean("IS_PLAYING",false);
         }
     };
 
-    @OnClick(R.id.img_btn_pauseplay)
+    @OnClick(R.id.img_btn_control)
     public void onPausePlayClicked(){
         mCallback.onPausePlay(isPlaying);
         if(isPlaying) {
-            mImgPausePlay.setImageResource(R.drawable.ic_big_play);
+            mImgPausePlay.setImageResource(R.drawable.ic_play);
+            isPlaying = false;
         }
         else {
-            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
+            mImgPausePlay.setImageResource(R.drawable.ic_pause);
+            isPlaying = true;
         }
-    }
-
-    @OnClick(R.id.img_btn_next)
-    public void onNextClicked(){
-        Intent intent = new Intent(BROADCAST_SKIP_TRACK);
-        intent.putExtra("SKIP_SWITCH", 1);
-        getActivity().sendBroadcast(intent);
-        isPlaying = true;
-    }
-
-    @OnClick(R.id.img_btn_prev)
-    public void onPrevClicked(){
-        Intent intent = new Intent(BROADCAST_SKIP_TRACK);
-        intent.putExtra("SKIP_SWITCH", 0);
-        getActivity().sendBroadcast(intent);
-        isPlaying = true;
     }
 
     private void initPreferences() {
@@ -156,9 +121,22 @@ public class MaximizedControllerFragment extends Fragment {
             populateFromDb(pos);
         }
         if(prefIsPlaying.getBoolean("IS_PLAYING",false)) {
-            mImgPausePlay.setImageResource(R.drawable.ic_big_pause);
+            mImgPausePlay.setImageResource(R.drawable.ic_pause);
             isPlaying = true;
         }
+    }
+
+    private void populateFromDb(int pos) {
+        SQLiteDatabase db = new CoreDBHelper(getActivity()).getWritableDatabase();
+        Cursor cursor = db.query(
+                io.denreyes.backdrop.data.CoreContract.TracksEntry.TABLE_NAME,
+                null, null, null, null, null, null, null
+        );
+        cursor.move(pos);
+
+        mTextTitle.setText(cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_TITLE)));
+        mTextArtist.setText(cursor.getString(cursor.getColumnIndex(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_ARTIST)));
+        mImgArt.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(CoreContract.TracksEntry.TRACK_IMG_URL))));
     }
 
     public interface OnPausePlay{

@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.denreyes.backdrop.Ambience.AmbientService;
+import io.denreyes.backdrop.service.AmbientService;
 
 /**
  * Created by DJ on 8/29/2015.

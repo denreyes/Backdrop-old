@@ -1,4 +1,4 @@
-package io.denreyes.backdrop.Ambience;
+package io.denreyes.backdrop.service;
 
 import android.app.Service;
 import android.content.Intent;

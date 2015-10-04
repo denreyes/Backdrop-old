@@ -1,4 +1,4 @@
-package io.denreyes.backdrop;
+package io.denreyes.backdrop.fragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,27 +14,25 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.denreyes.backdrop.Spotlight.SpotlightAdapter;
-import io.denreyes.backdrop.Spotlight.SpotlightModel;
+import io.denreyes.backdrop.AmbientActivity;
+import io.denreyes.backdrop.MainActivity;
+import io.denreyes.backdrop.R;
+import io.denreyes.backdrop.adapters.SpotlightAdapter;
+import io.denreyes.backdrop.model.SpotlightModel;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.FeaturedPlaylists;
-import kaaes.spotify.webapi.android.models.User;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

@@ -1,9 +1,7 @@
-package io.denreyes.backdrop.Playlist;
+package io.denreyes.backdrop.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.io.Serializable;
 
 /**
  * Created by DJ on 8/29/2015.

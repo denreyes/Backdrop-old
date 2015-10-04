@@ -1,4 +1,4 @@
-package io.denreyes.backdrop.Playlist;
+package io.denreyes.backdrop.adapters;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,29 +12,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.spotify.sdk.android.player.Config;
-import com.spotify.sdk.android.player.PlayConfig;
-import com.spotify.sdk.android.player.Player;
-import com.spotify.sdk.android.player.PlayerNotificationCallback;
-import com.spotify.sdk.android.player.PlayerState;
-import com.spotify.sdk.android.player.PlayerStateCallback;
-import com.spotify.sdk.android.player.Spotify;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import io.denreyes.backdrop.PlayerFragment;
+import io.denreyes.backdrop.model.PlaylistModel;
+import io.denreyes.backdrop.data.CoreContract;
+import io.denreyes.backdrop.data.CoreDBHelper;
 import io.denreyes.backdrop.R;
-import kaaes.spotify.webapi.android.SpotifyService;
-import kaaes.spotify.webapi.android.models.Track;
-import retrofit.Callback;
 
 /**
  * Created by DJ on 8/29/2015.
@@ -80,16 +69,16 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
         private void playlistDbUpdate() {
             prefPlaylist.edit().putString("PLAYLIST_ID", playlistId).apply();
-            SQLiteDatabase db = new TracksDBHelper(context).getWritableDatabase();
-            db.delete(TracksContract.TracksEntry.TABLE_NAME, null, null);
+            SQLiteDatabase db = new CoreDBHelper(context).getWritableDatabase();
+            db.delete(io.denreyes.backdrop.data.CoreContract.TracksEntry.TABLE_NAME, null, null);
             ContentValues values = new ContentValues();
             for (int x = 0; x < getItemCount(); x++) {
-                values.put(TracksContract.TracksEntry.TRACK_TITLE, mList.get(x).title);
-                values.put(TracksContract.TracksEntry.TRACK_ARTIST, mList.get(x).artist);
-                values.put(TracksContract.TracksEntry.TRACK_IMG_URL, mList.get(x).img_url);
-                values.put(TracksContract.TracksEntry.TRACK_SPOTIFY_ID, mList.get(x).track_id);
+                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_TITLE, mList.get(x).title);
+                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_ARTIST, mList.get(x).artist);
+                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_IMG_URL, mList.get(x).img_url);
+                values.put(io.denreyes.backdrop.data.CoreContract.TracksEntry.TRACK_SPOTIFY_ID, mList.get(x).track_id);
 
-                db.insert(TracksContract.TracksEntry.TABLE_NAME, null, values);
+                db.insert(CoreContract.TracksEntry.TABLE_NAME, null, values);
             }
         }
 

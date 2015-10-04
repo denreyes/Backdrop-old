@@ -13,7 +13,6 @@ import android.os.Looper;
 import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -22,9 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -39,8 +36,11 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import io.denreyes.backdrop.Playlist.PlaylistAdapter;
-import io.denreyes.backdrop.Playlist.PlaylistModel;
+import io.denreyes.backdrop.adapters.PlaylistAdapter;
+import io.denreyes.backdrop.fragments.MaximizedControllerFragment;
+import io.denreyes.backdrop.fragments.MinimizedControllerFragment;
+import io.denreyes.backdrop.fragments.SpotlightFragment;
+import io.denreyes.backdrop.model.PlaylistModel;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.User;
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements SlidingUpPanelLay
                     MAIN_THREAD.post(new Runnable() {
                         @Override
                         public void run() {
-                            mTextNavUser.setText(username);
+                            mTextNavUser.setText(username.split("\\s+")[0]);
                             mImgProfile.setImageURI(Uri.parse(profileUrl));
                         }
                     });

@@ -34,7 +34,7 @@
         </activity>
 
         <service
-            android:name=".Ambience.AmbientService"
+            android:name=".service.AmbientService"
             android:enabled="true" />
     </application>
 
