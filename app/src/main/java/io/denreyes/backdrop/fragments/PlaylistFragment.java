@@ -43,7 +43,7 @@ import retrofit.client.Response;
 /**
  * Created by Dj on 9/24/2015.
  */
-public class PlayerFragment extends Fragment {
+public class PlaylistFragment extends Fragment {
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
     @Bind(R.id.recycler_playlist)
