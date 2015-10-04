@@ -1,10 +1,8 @@
-package io.denreyes.backdrop.Playlist;
+package io.denreyes.backdrop.Data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import io.denreyes.backdrop.Playlist.TracksContract;
 
 /**
  * Created by Dj on 9/25/2015.
