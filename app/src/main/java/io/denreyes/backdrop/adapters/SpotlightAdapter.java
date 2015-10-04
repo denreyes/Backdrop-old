@@ -21,7 +21,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.denreyes.backdrop.MainActivity;
 import io.denreyes.backdrop.model.SpotlightModel;
-import io.denreyes.backdrop.fragments.PlayerFragment;
+import io.denreyes.backdrop.fragments.PlaylistFragment;
 import io.denreyes.backdrop.R;
 
 /**
@@ -57,21 +57,21 @@ public class SpotlightAdapter extends RecyclerView.Adapter<SpotlightAdapter.View
 
         @Override
         public void onClick(View v) {
-            switchToPlayerFragment();
+            switchToPlaylistFragment();
         }
 
-        private void switchToPlayerFragment() {
+        private void switchToPlaylistFragment() {
             Bundle bundle = new Bundle();
             bundle.putString("PLAYLIST_ID", mList.get(getPosition()).id);
             bundle.putString("PLAYLIST_IMG", mList.get(getPosition()).img_url);
             bundle.putString("PLAYLIST_TITLE", mList.get(getPosition()).title);
             bundle.putString("PLAYLIST_MIXER", mList.get(getPosition()).mixer);
 
-            PlayerFragment playerFragment = new PlayerFragment();
-            playerFragment.setArguments(bundle);
+            PlaylistFragment playlistFragment = new PlaylistFragment();
+            playlistFragment.setArguments(bundle);
             FragmentTransaction ft = ((MainActivity) context).getSupportFragmentManager().beginTransaction();
-            ft.addToBackStack(playerFragment.getClass().getName());
-            ft.replace(R.id.container, playerFragment).commit();
+            ft.addToBackStack(playlistFragment.getClass().getName());
+            ft.replace(R.id.container, playlistFragment).commit();
         }
     }
 
